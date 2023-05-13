@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">图书馆预约</string>
+    <string name="title_home">主页</string>
+    <string name="title_dashboard">快速预约</string>
+    <string name="title_notifications">用户信息</string>
+    <string name="action_back">返回</string>
+</resources>

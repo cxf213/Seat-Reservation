@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="myTextAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textSize">28sp</item> <!-- 设置合适的字体大小 -->
+    </style>
+</resources>
