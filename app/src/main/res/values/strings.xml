@@ -4,4 +4,8 @@
     <string name="title_dashboard">快速预约</string>
     <string name="title_notifications">用户信息</string>
     <string name="action_back">返回</string>
+    <string name="stuid">学号</string>
+    <string name="password">密码</string>
+    <string name="forget_password">忘记密码</string>
+    <string name="login">登陆</string>
 </resources>

@@ -83,16 +83,6 @@ public class TestFragment extends Fragment {
         });
         return rootView;
     }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        // 添加返回按钮项到选项菜单中
-        AppCompatActivity activity = (AppCompatActivity) requireActivity();
-        ActionBar actionBar = activity.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("第二个页面");
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
