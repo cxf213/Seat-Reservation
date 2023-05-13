@@ -20,6 +20,6 @@ public class LoginActivity extends AppCompatActivity {
     private void finishlogin() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-        //finish(); // 可选：关闭 LoginActivity
+        finish(); // 可选：关闭 LoginActivity
     }
 }
