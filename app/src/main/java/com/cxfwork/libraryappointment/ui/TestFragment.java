@@ -1,6 +1,5 @@
-package com.cxfwork.libraryappointment;
+package com.cxfwork.libraryappointment.ui;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,8 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-import androidx.appcompat.app.ActionBar;
 
+import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.databinding.FragmentTestBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 

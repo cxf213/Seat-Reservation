@@ -1,4 +1,4 @@
-package com.cxfwork.libraryappointment;
+package com.cxfwork.libraryappointment.ui;
 
 import androidx.lifecycle.ViewModel;
 
