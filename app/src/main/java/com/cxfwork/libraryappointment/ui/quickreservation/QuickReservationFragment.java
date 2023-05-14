@@ -1,4 +1,4 @@
-package com.cxfwork.libraryappointment.ui.dashboard;
+package com.cxfwork.libraryappointment.ui.quickreservation;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.cxfwork.libraryappointment.databinding.FragmentDashboardBinding;
+import com.cxfwork.libraryappointment.databinding.FragmentQuickReservationBinding;
 
-public class DashboardFragment extends Fragment {
+public class QuickReservationFragment extends Fragment {
 
-    private FragmentDashboardBinding binding;
+    private FragmentQuickReservationBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        DashboardViewModel dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        QuickReservationViewModel quickReservationViewModel =
+                new ViewModelProvider(this).get(QuickReservationViewModel.class);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        quickReservationViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
