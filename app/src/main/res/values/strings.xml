@@ -22,6 +22,9 @@
     <string name="Current_reserve_display_text">Your Current Reservations Here:</string>
     <string name="signin_btn">Sign In</string>
     <string name="cancel">Cancel</string>
-    <string name="no_reservation_record">No reservation record</string>
+    <string name="no_reservation_record">No reservation</string>
     <string name="look_for_record_btn">Look for more history Reservation</string>
+    <string name="historyrecord">History Records</string>
+    <string name="setting">Settings</string>
+    <string name="info">More Infomation</string>
 </resources>

@@ -23,9 +23,6 @@ public class QuickReservationFragment extends Fragment {
 
         binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        final TextView textView = binding.textDashboard;
-        quickReservationViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
