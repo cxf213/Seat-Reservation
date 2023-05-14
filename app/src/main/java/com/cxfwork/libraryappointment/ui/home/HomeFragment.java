@@ -23,32 +23,29 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private Button button;
-    private Button button1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
-
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
 
         NavController navController = NavHostFragment.findNavController(this);
-        button = binding.button1;
+        button = binding.lookForRecordBtn;
+
+
+
+
+
         button.setOnClickListener(v -> {
             button.setText(homeViewModel.getText().getValue());
             navController.navigate(R.id.navigation_test);
         });
-
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-
-        button1 = binding.buttontest1;
-        button1.setOnClickListener(new View.OnClickListener() {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(requireContext(), "1按钮被点击", Toast.LENGTH_SHORT).show();
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
                 View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_layout, null);
                 bottomSheetDialog.setContentView(bottomSheetView);
