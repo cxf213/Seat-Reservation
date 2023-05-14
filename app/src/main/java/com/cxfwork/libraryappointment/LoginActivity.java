@@ -103,8 +103,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void Nav2MainActivity() {
-        Snackbar.make(findViewById(android.R.id.content), R.string.login_success,
-                Snackbar.LENGTH_SHORT).show();
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish(); // 可选：关闭 LoginActivity

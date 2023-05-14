@@ -9,9 +9,9 @@
     <string name="forget_password">Forget Password?</string>
     <string name="login">Login/Register</string>
     <string name="login_failed">Login Failed</string>
-    <string name="stuName">Real Name</string>
-    <string name="stuClass">Class</string>
-    <string name="stuPhoneNum">Phone Number</string>
+    <string name="stuNamehint">Real Name</string>
+    <string name="stuClasshint">Class</string>
+    <string name="stuPhoneNumhint">Phone Number</string>
     <string name="register">Register</string>
     <string name="complete_info">you have not regstered yet. Complete your student info</string>
     <string name="acceptEULA">Accept the EULA</string>
@@ -25,6 +25,11 @@
     <string name="no_reservation_record">No reservation</string>
     <string name="look_for_record_btn">Look for more history Reservation</string>
     <string name="historyrecord">History Records</string>
-    <string name="setting">Settings</string>
+    <string name="settingTheme">Change Theme</string>
     <string name="info">More Infomation</string>
+    <string name="stuName"></string>
+    <string name="stuClass"></string>
+    <string name="stuID"></string>
+    <string name="stuPhoneNum"></string>
+    <string name="settinglang">Change Language</string>
 </resources>

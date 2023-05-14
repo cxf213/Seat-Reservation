@@ -26,7 +26,7 @@
         android:id="@+id/stuName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/stuName">
+        android:hint="@string/stuNamehint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
         android:id="@+id/stuClass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/stuClass">
+        android:hint="@string/stuClasshint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
         android:id="@+id/stuPhoneNum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/stuPhoneNum">
+        android:hint="@string/stuPhoneNumhint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

@@ -6,8 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.user.UserFragment">
 
+
+
     <androidx.cardview.widget.CardView
         android:id="@+id/userinfocard"
+        style="?attr/materialCardViewElevatedStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -46,7 +49,7 @@
                     style="@style/TextAppearance.AppCompat.Large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/stuName"
+                    android:text="@string/stuNamehint"
                     android:textAppearance="@style/ShapeAppearance.Material3.MediumComponent" />
 
                 <TextView
@@ -72,115 +75,56 @@
 
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/historiCard"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="32dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
+        android:layout_marginTop="100dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userinfocard">
 
-        <LinearLayout
+        <Button
+            android:id="@+id/historybtn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/historyrecord"
+            app:icon="@drawable/baseline_co_present_24" />
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:contentDescription="ontent_description_media"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/baseline_co_present_24" />
-            <Button
-                style="@style/Widget.Material3.Button.TextButton"
-                android:id="@+id/historybtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/historyrecord"
-                />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
-        android:clickable="true"
-        android:id="@+id/settingcard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="32dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/historiCard">
-
-        <LinearLayout
+        <Button
+            android:id="@+id/infobtn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/info"
+            app:icon="@drawable/baseline_info_24" />
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:contentDescription="ontent_description_media"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/baseline_settings_24" />
-
-            <Button
-                style="@style/Widget.Material3.Button.TextButton"
-                android:id="@+id/settingbtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/setting"
-                />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
-        android:clickable="true"
-        android:id="@+id/infocard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="32dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingcard">
-
-        <LinearLayout
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="20dp
+" />
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:contentDescription="ontent_description_media"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/baseline_info_24" />
+        <Button
+            android:id="@+id/themesettingbtn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/settinglang"
+            app:icon="@drawable/baseline_settings_24" />
+        <Button
+            android:id="@+id/langettingbtn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/settingTheme"
+            app:icon="@drawable/baseline_settings_24" />
 
-            <Button
-                style="@style/Widget.Material3.Button.TextButton"
-                android:id="@+id/infobtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/info"
-                />
+    </LinearLayout>
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
