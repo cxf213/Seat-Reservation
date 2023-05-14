@@ -32,4 +32,6 @@
     <string name="stuID"></string>
     <string name="stuPhoneNum"></string>
     <string name="settinglang">Change Language</string>
+    <string name="selectTime">Select Time and Location</string>
+    <string name="reflash">Refresh</string>
 </resources>

@@ -13,15 +13,11 @@ import com.cxfwork.libraryappointment.R;
 
 import java.util.List;
 
-public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.ViewHolder> {
+public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.ViewHolder> {
     private List<Integer> buttonNumbers;
-    private static OnButtonClickListener onButtonClickListener;
 
-    public ReserveBtnAdapter(List<Integer> buttonNumbers) {
+    public ClassroomAdapter(List<Integer> buttonNumbers) {
         this.buttonNumbers = buttonNumbers;
-    }
-    public void setOnButtonClickListener(OnButtonClickListener listener) {
-        this.onButtonClickListener = listener;
     }
 
     @NonNull
@@ -41,10 +37,8 @@ public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.Vi
             // 设置奇数位置的按钮为蓝色背景
             holder.button.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.md_theme_light_secondary));
         }
-        holder.button.setText(String.valueOf(number));
+        holder.button.setText(String.valueOf("教室编号"+number));
     }
-
-
 
     @Override
     public int getItemCount() {
@@ -56,24 +50,7 @@ public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.Vi
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             button = itemView.findViewById(R.id.button);
-
-            // 设置按钮的点击事件监听器
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 获取按钮在列表中的位置
-                    int position = getAdapterPosition();
-
-                    // 检查监听器是否存在
-                    if (onButtonClickListener != null) {
-                        // 调用监听器的回调方法，传递位置和按钮视图
-                        onButtonClickListener.onButtonClick(position, v);
-                    }
-                }
-            });
         }
     }
-    public interface OnButtonClickListener {
-        void onButtonClick(int position, View view);
-    }
 }
+

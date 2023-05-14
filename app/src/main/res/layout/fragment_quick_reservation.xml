@@ -19,12 +19,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/outlinedButton"
+        android:id="@+id/filterbtn"
         style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="2021-5-20   第1-6节课   博学一楼   A101"
+        android:text="2021-5-20 第1-6节课  博学一楼  A101"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedButton" />
+        app:layout_constraintTop_toBottomOf="@+id/filterbtn" />
 
     <ImageView
         android:id="@+id/imageView3"
