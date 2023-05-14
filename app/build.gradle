@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.cxfwork.libraryappointment'
     compileSdk 33
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.cxfwork.libraryappointment"

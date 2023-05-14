@@ -1,11 +1,21 @@
 <resources>
-    <string name="app_name">图书馆预约</string>
-    <string name="title_home">主页</string>
-    <string name="title_dashboard">快速预约</string>
-    <string name="title_notifications">用户信息</string>
-    <string name="action_back">返回</string>
-    <string name="stuid">学号</string>
-    <string name="password">密码</string>
-    <string name="forget_password">忘记密码</string>
-    <string name="login">登陆</string>
+    <string name="app_name">Seat reservation</string>
+    <string name="title_home">Main</string>
+    <string name="title_dashboard">Quick Reservation</string>
+    <string name="title_notifications">User</string>
+    <string name="action_back">Back</string>
+    <string name="stuid">Student ID</string>
+    <string name="password">Password</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="login">Login/Register</string>
+    <string name="login_failed">Login Failed</string>
+    <string name="stuName">Real Name</string>
+    <string name="stuClass">Class</string>
+    <string name="stuPhoneNum">Phone Number</string>
+    <string name="register">Register</string>
+    <string name="complete_info">you have not regstered yet. Complete your student info</string>
+    <string name="acceptEULA">Accept the EULA</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_success">Login Success</string>
+    <string name="error_phone">Wrong Phone Number</string>
 </resources>
