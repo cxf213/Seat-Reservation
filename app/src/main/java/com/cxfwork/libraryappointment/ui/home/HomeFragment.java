@@ -27,7 +27,6 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private Button button;
     private CommonViewModel commonViewModel;
-    private int reserveCount = 0;
     private MainActivity mainActivity;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,66 +51,64 @@ public class HomeFragment extends Fragment {
         commonViewModel.getUserReservation1().observe(this, new Observer<Map<String, String>>() {
             @Override
             public void onChanged(Map<String, String> UserReservation1) {
+                if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
+                    binding.cardno.setVisibility(View.VISIBLE);
+                else
+                    binding.cardno.setVisibility(View.GONE);
                 if(UserReservation1.get("haveReservation").equals("1")){
-                    if(binding.card1.getVisibility() == View.GONE) {
-                        reserveCount += 1;
                         binding.card1.setVisibility(View.VISIBLE);
-                    }
                 }else{
-                    if(binding.card1.getVisibility() == View.VISIBLE){
-                        reserveCount -= 1;
                         binding.card1.setVisibility(View.GONE);
-                    }
                 }
-                if(reserveCount == 0) binding.cardno.setVisibility(View.VISIBLE);
-                else binding.cardno.setVisibility(View.GONE);
+                if(UserReservation1.get("haveSignin").equals("1")) {
+                    binding.Signin1btn.setText("Signed in");
+                    binding.Signin1btn.setEnabled(false);
+                }else{
+                    binding.Signin1btn.setText("Sign in");
+                    binding.Signin1btn.setEnabled(true);
+                }
             }
         });
         commonViewModel.getUserReservation2().observe(this, new Observer<Map<String, String>>() {
             @Override
             public void onChanged(Map<String, String> UserReservation2) {
+                if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
+                    binding.cardno.setVisibility(View.VISIBLE);
+                else
+                    binding.cardno.setVisibility(View.GONE);
                 if(UserReservation2.get("haveReservation").equals("1")){
-                    if(binding.card2.getVisibility() == View.GONE) {
-                        reserveCount += 1;
                         binding.card2.setVisibility(View.VISIBLE);
-                    }
                 }else{
-                    if(binding.card2.getVisibility() == View.VISIBLE){
-                        reserveCount -= 1;
                         binding.card2.setVisibility(View.GONE);
-                    }
                 }
-                if(reserveCount == 0) binding.cardno.setVisibility(View.VISIBLE);
-                else binding.cardno.setVisibility(View.GONE);
+                if(UserReservation2.get("haveSignin").equals("1")) {
+                    binding.Signin2btn.setText("Signed in");
+                    binding.Signin2btn.setEnabled(false);
+                }else{
+                    binding.Signin2btn.setText("Sign in");
+                    binding.Signin2btn.setEnabled(true);
+                }
             }
         });
 
         Button signin1btn = binding.Signin1btn;
         signin1btn.setOnClickListener(v -> {
             mainActivity.reserveService.signin1();
-            signin1btn.setText("Signed in");
-            signin1btn.setEnabled(false);
             mainActivity.updatedata();
         });
         Button signin2btn = binding.Signin2btn;
         signin2btn.setOnClickListener(v -> {
             mainActivity.reserveService.signin2();
-            signin2btn.setText("Signed in");
-            signin2btn.setEnabled(false);
             mainActivity.updatedata();
         });
         Button cancel1btn = binding.Cancel1btn;
             cancel1btn.setOnClickListener(v -> {
             mainActivity.reserveService.cancel1();
-            cancel1btn.setText("Canceling");
-            cancel1btn.setEnabled(false);
             mainActivity.updatedata();
         });
         Button cancel2btn = binding.Cancel2btn;
         cancel2btn.setOnClickListener(v -> {
             mainActivity.reserveService.cancel2();
-            cancel2btn.setText("Canceling");
-            cancel2btn.setEnabled(false);
             mainActivity.updatedata();
         });
 

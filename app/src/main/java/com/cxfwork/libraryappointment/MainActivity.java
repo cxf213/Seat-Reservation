@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         commonViewModel = new ViewModelProvider(this).get(CommonViewModel.class);
         reserveService = new ReserveService();
+        updatedata();
         startDataUpdateTimer();
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
