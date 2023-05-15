@@ -55,7 +55,7 @@ public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.Vi
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.button);
+            button = itemView.findViewById(R.id.adapter_reserve_btn);
 
             // 设置按钮的点击事件监听器
             button.setOnClickListener(new View.OnClickListener() {

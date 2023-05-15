@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,11 +19,13 @@ import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.client.ClassroomAdapter;
 import com.cxfwork.libraryappointment.client.ReserveBtnAdapter;
 import com.cxfwork.libraryappointment.databinding.FragmentQuickReservationBinding;
+import com.cxfwork.libraryappointment.ui.CommonViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.RangeSlider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QuickReservationFragment extends Fragment {
@@ -30,6 +33,7 @@ public class QuickReservationFragment extends Fragment {
     private FragmentQuickReservationBinding binding;
     private ReserveBtnAdapter reserveBtnAdapter;
     private ClassroomAdapter classroomAdapter;
+    private CommonViewModel commonViewModel;
     private RecyclerView recyclerView,recyclerView2;
     private Button filterbtn;
     private int Date = -1,Timebegin = 2,Timeend = 7,Location = -1;
@@ -41,6 +45,8 @@ public class QuickReservationFragment extends Fragment {
 
         binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
+
 
         recyclerView = binding.recyclerview;
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
@@ -52,6 +58,13 @@ public class QuickReservationFragment extends Fragment {
             public void onButtonClick(int position, View view) {
                 // 处理按钮点击事件
                 Toast.makeText(view.getContext(), "Button clicked at position " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        commonViewModel.getNewReservationRooms().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String newData) {
+                Toast.makeText(requireContext(), newData, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -132,11 +145,20 @@ public class QuickReservationFragment extends Fragment {
                     }
                 });
                 /***********************************************/
-                recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
+                String[] buttonNames = {"教室编号1", "教室编号2", "教室编号3"};
+                List<String> buttonNamesList = Arrays.asList(buttonNames);
+
+                RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
                 recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 1));
-                List<Integer> buttonNumbers = generateButtonNumbers(); // 生成按钮编号的数据源
-                classroomAdapter = new ClassroomAdapter(buttonNumbers);
-                recyclerView2.setAdapter(reserveBtnAdapter);
+                ClassroomAdapter classroomAdapter = new ClassroomAdapter(buttonNamesList, new ClassroomAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        String selectedString = buttonNamesList.get(position);
+                        commonViewModel.setNewReservationRooms(selectedString);
+                    }
+                });
+                recyclerView2.setAdapter(classroomAdapter);
+
 
                 bottomSheetDialog.show();
             }

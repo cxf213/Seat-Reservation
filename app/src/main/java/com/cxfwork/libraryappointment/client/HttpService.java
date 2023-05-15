@@ -16,4 +16,8 @@ public class HttpService {
         Gson gson = new Gson();
         return gson.toJson(map);
     }
+    public static String getUserReservation(){
+        String json = "{\"haveReservation1\":\"1\",\"haveSignin1\":\"0\",\"Seat1\":\"1号座位\",\"location1\":\"博学楼一楼-A101\",\"time1\":\"2023-5-12 7:00-8:00\",\"haveReservation2\":\"1\",\"haveSignin2\":\"0\",\"Seat2\":\"2号座位\",\"location2\":\"博学楼一楼-A101\",\"time2\":\"2023-5-12 8:00-9:00\"}";
+        return json;
+    }
 }
