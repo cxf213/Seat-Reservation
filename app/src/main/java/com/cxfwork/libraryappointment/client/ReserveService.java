@@ -4,42 +4,35 @@ package com.cxfwork.libraryappointment.client;
 import java.util.Map;
 
 public class ReserveService {
-    private Map<String,String> reserveInfo1;
-    private Map<String,String> reserveInfo2;
+    private Map<String,String> UserReserveInfo;
     public ReserveService(){
-        reserveInfo1 = new java.util.HashMap<>();
-        reserveInfo2 = new java.util.HashMap<>();
-        reserveInfo1.put("haveReservation","1");
-        reserveInfo1.put("haveSignin","0");
-        reserveInfo1.put("time","0");
-        reserveInfo1.put("Seat","1号座位");
-        reserveInfo1.put("location","博学楼一楼-A101");
-        reserveInfo1.put("time","2023-5-12 20:00-21:00");
-        reserveInfo2.put("haveReservation","1");
-        reserveInfo2.put("haveSignin","0");
-        reserveInfo2.put("time","0");
-        reserveInfo2.put("Seat","2号座位");
-        reserveInfo2.put("location","博学楼一楼-A102");
-        reserveInfo2.put("time","2023-5-12 20:00-21:00");
-    }
-    public Map<String,String> getReserveInfo1(){
+        UserReserveInfo = new java.util.HashMap<>();
+        UserReserveInfo.put("haveReservation1","1");
+        UserReserveInfo.put("haveSignin1","0");
+        UserReserveInfo.put("Seat1","1号座位");
+        UserReserveInfo.put("location1","博学楼一楼-A101");
+        UserReserveInfo.put("time1","2023-5-12 7:00-8:00");
 
-        return reserveInfo1;
+        UserReserveInfo.put("haveReservation2","1");
+        UserReserveInfo.put("haveSignin2","0");
+        UserReserveInfo.put("Seat2","2号座位");
+        UserReserveInfo.put("location2","博学楼一楼-A102");
+        UserReserveInfo.put("time2","2023-5-12 20:00-21:00");
     }
-    public Map<String,String> getReserveInfo2(){
+    public Map<String,String> getUserReserveInfo(){
 
-        return reserveInfo2;
+        return UserReserveInfo;
     }
     public void signin1(){
-        reserveInfo1.replace("haveSignin","1");
+        UserReserveInfo.replace("haveSignin1","1");
     }
     public void signin2(){
-        reserveInfo2.replace("haveSignin","1");
+        UserReserveInfo.replace("haveSignin2","1");
     }
     public void cancel1(){
-        reserveInfo1.replace("haveReservation","0");
+        UserReserveInfo.replace("haveReservation1","0");
     }
     public void cancel2(){
-        reserveInfo2.replace("haveReservation","0");
+        UserReserveInfo.replace("haveReservation2","0");
     }
 }

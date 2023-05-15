@@ -28,4 +28,9 @@
         android:name="com.cxfwork.libraryappointment.ui.TestFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_test" />
+    <fragment
+        android:id="@+id/moreInfomationFragment"
+        android:name="com.cxfwork.libraryappointment.ui.user.MoreInfomationFragment"
+        android:label="fragment_more_infomation"
+        tools:layout="@layout/fragment_more_infomation" />
 </navigation>

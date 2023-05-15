@@ -25,7 +25,6 @@ import java.util.Map;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private Button button;
     private CommonViewModel commonViewModel;
     private MainActivity mainActivity;
 
@@ -38,56 +37,18 @@ public class HomeFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
 
         NavController navController = NavHostFragment.findNavController(this);
-        button = binding.lookForRecordBtn;
-        button.setOnClickListener(v -> {
-            button.setText(homeViewModel.getText().getValue());
-            navController.navigate(R.id.navigation_test);
+        Button navInfoButton = binding.lookForRecordBtn;
+        navInfoButton.setOnClickListener(v -> {
+            navInfoButton.setText(homeViewModel.getText().getValue());
+            navController.navigate(R.id.moreInfomationFragment);
         });
 
-        binding.card1.setVisibility(View.GONE);
-        binding.card2.setVisibility(View.GONE);
-
+        // 绑定卡片和预约数据
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
-        commonViewModel.getUserReservation1().observe(this, new Observer<Map<String, String>>() {
+        commonViewModel.getUserReservation().observe(this, new Observer<Map<String, String>>() {
             @Override
             public void onChanged(Map<String, String> UserReservation1) {
-                if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
-                    binding.cardno.setVisibility(View.VISIBLE);
-                else
-                    binding.cardno.setVisibility(View.GONE);
-                if(UserReservation1.get("haveReservation").equals("1")){
-                        binding.card1.setVisibility(View.VISIBLE);
-                }else{
-                        binding.card1.setVisibility(View.GONE);
-                }
-                if(UserReservation1.get("haveSignin").equals("1")) {
-                    binding.Signin1btn.setText("Signed in");
-                    binding.Signin1btn.setEnabled(false);
-                }else{
-                    binding.Signin1btn.setText("Sign in");
-                    binding.Signin1btn.setEnabled(true);
-                }
-            }
-        });
-        commonViewModel.getUserReservation2().observe(this, new Observer<Map<String, String>>() {
-            @Override
-            public void onChanged(Map<String, String> UserReservation2) {
-                if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
-                    binding.cardno.setVisibility(View.VISIBLE);
-                else
-                    binding.cardno.setVisibility(View.GONE);
-                if(UserReservation2.get("haveReservation").equals("1")){
-                        binding.card2.setVisibility(View.VISIBLE);
-                }else{
-                        binding.card2.setVisibility(View.GONE);
-                }
-                if(UserReservation2.get("haveSignin").equals("1")) {
-                    binding.Signin2btn.setText("Signed in");
-                    binding.Signin2btn.setEnabled(false);
-                }else{
-                    binding.Signin2btn.setText("Sign in");
-                    binding.Signin2btn.setEnabled(true);
-                }
+                UpdateCards(UserReservation1);
             }
         });
 
@@ -139,7 +100,51 @@ public class HomeFragment extends Fragment {
 //        });
         return root;
     }
+    private void UpdateCard1Info(Map<String, String> UserReservation){
+        binding.card1SeatPos.setText(UserReservation.get("Seat1"));
+        binding.card1SeatPos2.setText(UserReservation.get("location1"));
+        binding.card1SeatTime.setText(UserReservation.get("time1"));
+    }
+    private void UpdateCard2Info(Map<String, String> UserReservation){
+        binding.card2SeatPos.setText(UserReservation.get("Seat2"));
+        binding.card2SeatPos2.setText(UserReservation.get("location2"));
+        binding.card2SeatTime.setText(UserReservation.get("time2"));
+    }
+    public void UpdateCards(Map<String, String> UserReservation) {
+        if(UserReservation.get("haveReservation1").equals("1")){
+            UpdateCard1Info(UserReservation);
+            binding.card1.setVisibility(View.VISIBLE);
+        }else{
+            binding.card1.setVisibility(View.GONE);
+        }
 
+        if(UserReservation.get("haveSignin1").equals("1")) {
+            binding.Signin1btn.setText("Signed in");
+            binding.Signin1btn.setEnabled(false);
+        }else{
+            binding.Signin1btn.setText("Sign in");
+            binding.Signin1btn.setEnabled(true);
+        }
+
+        if(UserReservation.get("haveReservation2").equals("1")){
+            UpdateCard2Info(UserReservation);
+            binding.card2.setVisibility(View.VISIBLE);
+        }else{
+            binding.card2.setVisibility(View.GONE);
+        }
+
+        if(UserReservation.get("haveSignin2").equals("1")) {
+            binding.Signin2btn.setText("Signed in");
+            binding.Signin2btn.setEnabled(false);
+        }else{
+            binding.Signin2btn.setText("Sign in");
+            binding.Signin2btn.setEnabled(true);
+        }
+        if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
+            binding.cardno.setVisibility(View.VISIBLE);
+        else
+            binding.cardno.setVisibility(View.GONE);
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

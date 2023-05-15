@@ -2,7 +2,6 @@ package com.cxfwork.libraryappointment;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Toast;
 
 import com.cxfwork.libraryappointment.client.ReserveService;
 import com.cxfwork.libraryappointment.ui.CommonViewModel;
@@ -16,8 +15,6 @@ import androidx.navigation.ui.NavigationUI;
 
 
 import com.cxfwork.libraryappointment.databinding.ActivityMainBinding;
-
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updatedata(){
-        commonViewModel.setUserReservation1(reserveService.getReserveInfo1());
-        commonViewModel.setUserReservation2(reserveService.getReserveInfo2());
+        commonViewModel.setUserReservation(reserveService.getUserReserveInfo());
     }
 
     int count = 1;
@@ -55,15 +51,12 @@ public class MainActivity extends AppCompatActivity {
         runnable = new Runnable() {
             @Override
             public void run() {
-                commonViewModel.setUserReservation1(reserveService.getReserveInfo1());
-                commonViewModel.setUserReservation2(reserveService.getReserveInfo2());
+                commonViewModel.setUserReservation(reserveService.getUserReserveInfo());
                 long delayMillis = 10000; // 5秒
                 count++;
                 handler.postDelayed(this, delayMillis);
             }
         };
-
-        // 启动首次更新任务
         handler.post(runnable);
     }
 
