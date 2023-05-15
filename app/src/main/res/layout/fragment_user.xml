@@ -62,7 +62,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/filledButton"
+                android:id="@+id/userinfobtn"
                 style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,8 +104,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="20dp
-" />
+            android:layout_height="20dp" />
 
         <Button
             android:id="@+id/themesettingbtn"

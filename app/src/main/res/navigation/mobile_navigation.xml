@@ -21,7 +21,8 @@
         android:id="@+id/navigation_notifications"
         android:name="com.cxfwork.libraryappointment.ui.user.UserFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_user" />
+        tools:layout="@layout/fragment_user" >
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_test"
@@ -33,4 +34,14 @@
         android:name="com.cxfwork.libraryappointment.ui.user.MoreInfomationFragment"
         android:label="fragment_more_infomation"
         tools:layout="@layout/fragment_more_infomation" />
+    <fragment
+        android:id="@+id/reserveHistoryFragment"
+        android:name="com.cxfwork.libraryappointment.ui.user.ReserveHistoryFragment"
+        android:label="fragment_reserve_history"
+        tools:layout="@layout/fragment_reserve_history" />
+    <fragment
+        android:id="@+id/userInfoModifyFragment"
+        android:name="com.cxfwork.libraryappointment.ui.user.UserInfoModifyFragment"
+        android:label="fragment_user_info_modify"
+        tools:layout="@layout/fragment_user_info_modify" />
 </navigation>

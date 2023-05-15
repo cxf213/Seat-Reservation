@@ -29,9 +29,17 @@ public class UserFragment extends Fragment {
         View root = binding.getRoot();
 
         NavController navController = NavHostFragment.findNavController(this);
+        Button navUserInfoButton = binding.userinfobtn;
+        navUserInfoButton.setOnClickListener(v -> {
+            navController.navigate(R.id.userInfoModifyFragment);
+        });
         Button navInfoButton = binding.infobtn;
         navInfoButton.setOnClickListener(v -> {
             navController.navigate(R.id.moreInfomationFragment);
+        });
+        Button navHistoryButton = binding.historybtn;
+        navHistoryButton.setOnClickListener(v -> {
+            navController.navigate(R.id.reserveHistoryFragment);
         });
 
         return root;
