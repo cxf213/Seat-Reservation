@@ -10,4 +10,18 @@
     <string name="forget_password">忘记密码</string>
     <string name="login">登陆/注册</string>
     <string name="login_failed">登陆失败</string>
+    <string name="welcome_text">，欢迎！</string>
+    <string name="Current_reserve_display_text">你当前的预约信息为：</string>
+    <string name="signin_btn">签到</string>
+    <string name="cancel">取消</string>
+    <string name="no_reservation_record">当前无预约</string>
+    <string name="look_for_record_btn">查看更多预约记录</string>
+    <string name="historyrecord">预约记录</string>
+    <string name="settingTheme">改变主题</string>
+    <string name="info">更多信息</string>
+    <string name="settinglang">改变语言</string>
+    <string name="selectTime">选择时间</string>
+    <string name="reflash">刷新</string>
+    <string name="modify">修改</string>
+    <string name="modifytext">修改个人信息，只需要填写你需要修改的</string>
 </resources>

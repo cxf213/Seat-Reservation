@@ -112,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="@string/settinglang"
+            android:text="@string/settingTheme"
             app:icon="@drawable/baseline_settings_24" />
         <Button
             android:id="@+id/langettingbtn"
@@ -120,7 +120,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="@string/settingTheme"
+            android:text="@string/settinglang"
             app:icon="@drawable/baseline_settings_24" />
 
     </LinearLayout>

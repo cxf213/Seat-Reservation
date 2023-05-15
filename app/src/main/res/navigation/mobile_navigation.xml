@@ -39,9 +39,4 @@
         android:name="com.cxfwork.libraryappointment.ui.user.ReserveHistoryFragment"
         android:label="fragment_reserve_history"
         tools:layout="@layout/fragment_reserve_history" />
-    <fragment
-        android:id="@+id/userInfoModifyFragment"
-        android:name="com.cxfwork.libraryappointment.ui.user.UserInfoModifyFragment"
-        android:label="fragment_user_info_modify"
-        tools:layout="@layout/fragment_user_info_modify" />
 </navigation>

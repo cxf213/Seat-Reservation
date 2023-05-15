@@ -75,29 +75,7 @@ public class HomeFragment extends Fragment {
 
 
 
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-//                View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_layout, null);
-//                bottomSheetDialog.setContentView(bottomSheetView);
-//
-//                // 找到按钮
-//                Button bottomSheetButton = bottomSheetView.findViewById(R.id.bottom_sheet_button);
-//                // 设置按钮的点击事件监听器
-//                bottomSheetButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        // 处理按钮的点击事件
-//                        Toast.makeText(requireContext(), "按钮被点击", Toast.LENGTH_SHORT).show();
-//                        bottomSheetDialog.dismiss(); // 关闭 Bottom Sheet
-//                    }
-//                });
-//
-//                bottomSheetDialog.show();
-//            }
-//
-//        });
+
         return root;
     }
     private void UpdateCard1Info(Map<String, String> UserReservation){
