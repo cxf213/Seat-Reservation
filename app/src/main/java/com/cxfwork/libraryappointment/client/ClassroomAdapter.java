@@ -40,6 +40,11 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
         return stringList.size();
     }
 
+    public void updateData(List<String> newData) {
+        stringList = newData;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Button classroomBtn;
 

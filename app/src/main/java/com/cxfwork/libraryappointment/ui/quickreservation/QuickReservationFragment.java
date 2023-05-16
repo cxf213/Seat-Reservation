@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.client.ClassroomAdapter;
 import com.cxfwork.libraryappointment.client.ReserveBtnAdapter;
+import com.cxfwork.libraryappointment.client.ReserveService;
 import com.cxfwork.libraryappointment.databinding.FragmentQuickReservationBinding;
 import com.cxfwork.libraryappointment.ui.CommonViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -25,18 +26,16 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.RangeSlider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class QuickReservationFragment extends Fragment {
 
     private FragmentQuickReservationBinding binding;
     private ReserveBtnAdapter reserveBtnAdapter;
-    private ClassroomAdapter classroomAdapter;
     private CommonViewModel commonViewModel;
-    private RecyclerView recyclerView,recyclerView2;
-    private Button filterbtn;
-    private int Date = -1,Timebegin = 2,Timeend = 7,Location = -1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,9 +45,11 @@ public class QuickReservationFragment extends Fragment {
         binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
+        commonViewModel.setNewReservation(generateBasicFilter());
+        Button filterbtn = binding.filterbtn;
 
 
-        recyclerView = binding.recyclerview;
+        RecyclerView recyclerView = binding.recyclerview;
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         List<Integer> buttonNumbers = generateButtonNumbers(); // 生成按钮编号的数据源
         reserveBtnAdapter = new ReserveBtnAdapter(buttonNumbers);
@@ -61,20 +62,22 @@ public class QuickReservationFragment extends Fragment {
             }
         });
 
-        commonViewModel.getNewReservationRooms().observe(getViewLifecycleOwner(), new Observer<String>() {
+        //确定筛选器后，筛选器的数据将被存到这里，以便生成请求
+        commonViewModel.getNewReservation().observe(this, new Observer<Map<String, String>>() {
             @Override
-            public void onChanged(String newData) {
-                Toast.makeText(requireContext(), newData, Toast.LENGTH_SHORT).show();
+            public void onChanged(Map<String, String> NewReservation) {
+                String displaystr = (NewReservation.get("DateID").equals("1")? "今天":"明天") +" 第"+
+                        (Integer.parseInt(Objects.requireNonNull(NewReservation.get("TimeIDbegin")))+1)+"-"+
+                        NewReservation.get("TimeIDend")+"节课 博学"+
+                        NewReservation.get("Building")+"楼  "+
+                        NewReservation.get("Room");
+                filterbtn.setText(displaystr);
+                Toast.makeText(requireContext(), NewReservation.toString(), Toast.LENGTH_SHORT).show();
             }
         });
-
-        filterbtn = binding.filterbtn;
         filterbtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                filterSheetProcess(v);
-            }
-
+            public void onClick(View v) { filterSheetProcess(v); }
         });
 
         return root;
@@ -93,23 +96,6 @@ public class QuickReservationFragment extends Fragment {
             }
         });
 
-        // 找到按钮
-        Button filterConfirmBtn = fragment_filter_selection.findViewById(R.id.filterreflashBtn);
-        // 设置按钮的点击事件监听器
-        filterConfirmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(Date>=0 && Timebegin>=0 && Timeend>=0 && Location>=0){
-                    String sfilter = "Date:"+Date+"Timebegin:"+Timebegin+"Timeend:"+Timeend+"Location:"+Location;
-                    //TODO
-                    Toast.makeText(requireContext(), sfilter, Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(requireContext(), "请填写完整信息", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
         /***********************************************/
         RangeSlider rangeSlider = fragment_filter_selection.findViewById(R.id.timepicker);
         rangeSlider.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
@@ -119,13 +105,9 @@ public class QuickReservationFragment extends Fragment {
             @Override
             @SuppressLint("RestrictedApi")
             public void onStopTrackingTouch(@NonNull RangeSlider slider) {
-
                 List<Float> values = rangeSlider.getValues();
-                float minValue = values.get(0);
-                float maxValue = values.get(1);
-                Timebegin = (int)minValue;
-                Timeend = (int)maxValue;
-                Toast.makeText(requireContext(), "Min value: " + minValue+"Max value: " + maxValue, Toast.LENGTH_SHORT).show();
+                commonViewModel.updateNewReservationValue("TimeIDbegin",String.valueOf(((int)(float)values.get(0))));
+                commonViewModel.updateNewReservationValue("TimeIDend",String.valueOf(((int)(float)values.get(1))));
             }
 
         });
@@ -135,8 +117,7 @@ public class QuickReservationFragment extends Fragment {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if(isChecked){
-                    if(checkedId == R.id.todaybtn) Date = 1;
-                    if(checkedId == R.id.nextdaybtn) Date = 2;
+                    commonViewModel.updateNewReservationValue("DateID",checkedId == R.id.todaybtn ? "1" : "2");
                 }
             }
         });
@@ -145,31 +126,49 @@ public class QuickReservationFragment extends Fragment {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if(isChecked){
-                    if(checkedId == R.id.locationbutton1) Location = 1;
-                    if(checkedId == R.id.locationbutton2) Location = 2;
-                    if(checkedId == R.id.locationbutton3) Location = 3;
-                    if(checkedId == R.id.locationbutton4) Location = 4;
-                    if(checkedId == R.id.locationbutton5) Location = 4;
+                    if(checkedId == R.id.locationbutton1) commonViewModel.updateNewReservationValue("Building","1");
+                    if(checkedId == R.id.locationbutton2) commonViewModel.updateNewReservationValue("Building","2");
+                    if(checkedId == R.id.locationbutton3) commonViewModel.updateNewReservationValue("Building","3");
+                    if(checkedId == R.id.locationbutton4) commonViewModel.updateNewReservationValue("Building","4");
+                    if(checkedId == R.id.locationbutton5) commonViewModel.updateNewReservationValue("Building","5");
                 }
             }
         });
         /***********************************************/
-        String[] buttonNames = {"教室编号1", "教室编号2", "教室编号3"};
-        List<String> buttonNamesList = Arrays.asList(buttonNames);
 
+        List<String> roomsNamesList = ReserveService.getRoomsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue()));
         RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
         recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        ClassroomAdapter classroomAdapter = new ClassroomAdapter(buttonNamesList, new ClassroomAdapter.OnItemClickListener() {
+        ClassroomAdapter classroomAdapter = new ClassroomAdapter(roomsNamesList, new ClassroomAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String selectedString = buttonNamesList.get(position);
-                commonViewModel.setNewReservationRooms(selectedString);
+                String selectedString = roomsNamesList.get(position);
+                commonViewModel.updateNewReservationValue("Room",selectedString);
+                bottomSheetDialog.dismiss();
             }
         });
         recyclerView2.setAdapter(classroomAdapter);
 
+        Button filterReflashBtn = fragment_filter_selection.findViewById(R.id.filterreflashBtn);
+        filterReflashBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
+            }
+        });
+
 
         bottomSheetDialog.show();
+    }
+
+    private Map<String,String> generateBasicFilter(){
+        Map<String,String> basicFilter = new HashMap<>();
+        basicFilter.put("DateID","2");
+        basicFilter.put("TimeIDbegin","0");
+        basicFilter.put("TimeIDend","2");
+        basicFilter.put("Building","1");
+        basicFilter.put("Room","A101");
+        return basicFilter;
     }
 
     private List<Integer> generateButtonNumbers() {
