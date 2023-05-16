@@ -40,7 +40,7 @@ public class HomeFragment extends Fragment {
         Button navInfoButton = binding.lookForRecordBtn;
         navInfoButton.setOnClickListener(v -> {
             navInfoButton.setText(homeViewModel.getText().getValue());
-            navController.navigate(R.id.moreInfomationFragment);
+            navController.navigate(R.id.reserveHistoryFragment);
         });
 
         // 绑定卡片和预约数据

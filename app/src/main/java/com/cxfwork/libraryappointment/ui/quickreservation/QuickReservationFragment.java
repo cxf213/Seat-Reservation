@@ -149,7 +149,7 @@ public class QuickReservationFragment extends Fragment {
                 List<String> buttonNamesList = Arrays.asList(buttonNames);
 
                 RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
-                recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 1));
+                recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 2));
                 ClassroomAdapter classroomAdapter = new ClassroomAdapter(buttonNamesList, new ClassroomAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
