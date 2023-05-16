@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cxfwork.libraryappointment.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.ViewHolder> {
@@ -46,7 +47,7 @@ public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.Vi
     }
 
     public void updateData(List<String> newData) {
-        RoomsList = newData;
+        RoomsList = new ArrayList<String>(newData);
         notifyDataSetChanged();
     }
 

@@ -1,6 +1,11 @@
 package com.cxfwork.libraryappointment.ui.quickreservation;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +14,15 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.client.ClassroomAdapter;
@@ -25,6 +33,8 @@ import com.cxfwork.libraryappointment.ui.CommonViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +47,7 @@ public class QuickReservationFragment extends Fragment {
     private FragmentQuickReservationBinding binding;
     private ReserveBtnAdapter reserveBtnAdapter;
     private CommonViewModel commonViewModel;
+    private String displaystr;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -56,14 +67,10 @@ public class QuickReservationFragment extends Fragment {
         reserveBtnAdapter = new ReserveBtnAdapter(seatsNamesList, new ReserveBtnAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String[] selectedString = seatsNamesList.get(position).split("#");
-                if(!selectedString[1].equals("0")){
-                    //TODO: 弹出电话号码
-                    Toast.makeText(requireContext(), "该座位已被预约", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // 最终预约
+                String[] selectedString = ReserveService.getSeatsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue())).get(position).split("#");
                 commonViewModel.updateNewReservationValue("Seat", selectedString[0]);
-                //TODO: 生成请求
+                dialogDisplay(selectedString);
             }
         });
         recyclerView.setAdapter(reserveBtnAdapter);
@@ -73,13 +80,12 @@ public class QuickReservationFragment extends Fragment {
         commonViewModel.getNewReservation().observe(this, new Observer<Map<String, String>>() {
             @Override
             public void onChanged(Map<String, String> NewReservation) {
-                String displaystr = (NewReservation.get("DateID").equals("1") ? "今天" : "明天") + " 第" +
+                displaystr = (NewReservation.get("DateID").equals("1") ? "今天" : "明天") + " 第" +
                         (Integer.parseInt(Objects.requireNonNull(NewReservation.get("TimeIDbegin"))) + 1) + "-" +
                         NewReservation.get("TimeIDend") + "节课 博学" +
                         NewReservation.get("Building") + "楼  " +
                         NewReservation.get("Room");
                 filterbtn.setText(displaystr);
-                Toast.makeText(requireContext(), NewReservation.toString(), Toast.LENGTH_SHORT).show();
             }
         });
         filterbtn.setOnClickListener(new View.OnClickListener() {
@@ -114,7 +120,7 @@ public class QuickReservationFragment extends Fragment {
             public void onItemClick(int position) {
                 String[] selectedString = ReserveService.getRoomsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue())).get(position).split("#");
                 if(!selectedString[1].equals("0")){
-                    Toast.makeText(requireContext(), "该教室无法预约", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "该教室无法预约:"+selectedString[1], Toast.LENGTH_SHORT).show();
                     return;
                 }
                 commonViewModel.updateNewReservationValue("Room", selectedString[0]);
@@ -185,6 +191,63 @@ public class QuickReservationFragment extends Fragment {
 
         bottomSheetDialog.show();
     }
+
+    private void dialogDisplay(String[] selectedString){
+        if(selectedString[1].equals("0")){
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+            builder.setTitle(R.string.reservationDialogConfirmTitle)
+                    .setMessage(displaystr + " " + selectedString[0] + "号座位")
+                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Map<String,String> result = ReserveService.reserve(commonViewModel.getNewReservation().getValue());
+                            if(result.get("status").equals("1")) {
+                                Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(requireContext(), R.string.reserveError +result.get("message"), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            return;
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }else{
+            Map<String,String> result = ReserveService.reserve(commonViewModel.getNewReservation().getValue());
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+            builder.setTitle(R.string.reserveError)
+                    .setMessage(getString(R.string.reserveFailure,displaystr+selectedString[0] + "号",result.get("message")))
+                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Uri uri = Uri.parse("tel:" + result.get("phone"));
+                            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                            if(ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
+                                Intent intent = new Intent(Intent.ACTION_CALL, uri);
+                                startActivity(intent);
+                            }
+                            else
+                                Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            return;
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
 
     private Map<String, String> generateBasicFilter() {
         Map<String, String> basicFilter = new HashMap<>();
