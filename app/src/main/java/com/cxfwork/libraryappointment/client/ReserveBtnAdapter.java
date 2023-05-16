@@ -14,66 +14,53 @@ import com.cxfwork.libraryappointment.R;
 import java.util.List;
 
 public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.ViewHolder> {
-    private List<Integer> buttonNumbers;
-    private static OnButtonClickListener onButtonClickListener;
+    private List<String> RoomsList;
+    private ReserveBtnAdapter.OnItemClickListener onItemClickListener;
 
-    public ReserveBtnAdapter(List<Integer> buttonNumbers) {
-        this.buttonNumbers = buttonNumbers;
-    }
-    public void setOnButtonClickListener(OnButtonClickListener listener) {
-        this.onButtonClickListener = listener;
+    public ReserveBtnAdapter(List<String> RoomsList, ReserveBtnAdapter.OnItemClickListener onItemClickListener) {
+        this.RoomsList = RoomsList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ReserveBtnAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_reserve_button, parent, false);
-        return new ViewHolder(view);
+        return new ReserveBtnAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        int number = buttonNumbers.get(position);
-        if (position % 2 == 0) {
-            // 设置偶数位置的按钮为红色背景
-            holder.button.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.md_theme_light_primary));
-        } else {
-            // 设置奇数位置的按钮为蓝色背景
-            holder.button.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.md_theme_light_secondary));
-        }
-        holder.button.setText(String.valueOf(number));
+    public void onBindViewHolder(@NonNull ReserveBtnAdapter.ViewHolder holder, int position) {
+        String item = RoomsList.get(position);
+        holder.classroomBtn.setText(item);
     }
-
-
 
     @Override
     public int getItemCount() {
-        return buttonNumbers.size();
+        return RoomsList.size();
     }
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public Button button;
+
+    public void updateData(List<String> newData) {
+        RoomsList = newData;
+        notifyDataSetChanged();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private Button classroomBtn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.adapter_reserve_btn);
+            classroomBtn = itemView.findViewById(R.id.adapter_reserve_btn);
+            classroomBtn.setOnClickListener(this);
+        }
 
-            // 设置按钮的点击事件监听器
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 获取按钮在列表中的位置
-                    int position = getAdapterPosition();
-
-                    // 检查监听器是否存在
-                    if (onButtonClickListener != null) {
-                        // 调用监听器的回调方法，传递位置和按钮视图
-                        onButtonClickListener.onButtonClick(position, v);
-                    }
-                }
-            });
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onItemClick(getAdapterPosition());
         }
     }
-    public interface OnButtonClickListener {
-        void onButtonClick(int position, View view);
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
     }
 }

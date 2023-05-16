@@ -30,7 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
+        android:id="@+id/roomrecyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
@@ -46,7 +46,7 @@
         android:src="@drawable/transparent_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/recyclerview" />
+        app:layout_constraintTop_toTopOf="@+id/roomrecyclerview" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

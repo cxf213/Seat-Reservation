@@ -65,7 +65,7 @@
                 android:text="Today" />
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/nextdaybtn"
+                android:id="@+id/tomorrowbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="tomorrow"

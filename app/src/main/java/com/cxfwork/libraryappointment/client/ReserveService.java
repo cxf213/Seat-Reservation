@@ -1,9 +1,11 @@
 package com.cxfwork.libraryappointment.client;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ReserveService {
     private Map<String,String> UserReserveInfo;
@@ -29,10 +31,23 @@ public class ReserveService {
 
     public static List<String> getRoomsList(Map<String, String> filter){
         String[] buttonNames = {"A101", "A102", "A103"};
-        String[] buttonNames2 = {"A101"};
+        List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
         if(filter.get("DateID").equals("1")){
-            buttonNames = buttonNames2;
+            lists.add("A201");
         }
-        return Arrays.asList(buttonNames);
+        return lists;
+    }
+
+    public static List<String> getSeatsList(Map<String, String> filter){
+        String[] buttonNames = {"1", "2", "3"};
+        List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
+
+        if(Objects.equals(filter.get("Room"), "A102")){
+            lists.add("4");
+        }
+        if(Objects.equals(filter.get("Room"), "A201")){
+            lists.add("5");
+        }
+        return lists;
     }
 }

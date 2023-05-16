@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cxfwork.libraryappointment.R;
@@ -14,11 +13,11 @@ import com.cxfwork.libraryappointment.R;
 import java.util.List;
 
 public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.ViewHolder> {
-    private List<String> stringList;
+    private List<String> RoomsList;
     private OnItemClickListener onItemClickListener;
 
-    public ClassroomAdapter(List<String> stringList, OnItemClickListener onItemClickListener) {
-        this.stringList = stringList;
+    public ClassroomAdapter(List<String> RoomsList, OnItemClickListener onItemClickListener) {
+        this.RoomsList = RoomsList;
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -31,17 +30,17 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String item = stringList.get(position);
+        String item = RoomsList.get(position);
         holder.classroomBtn.setText(item);
     }
 
     @Override
     public int getItemCount() {
-        return stringList.size();
+        return RoomsList.size();
     }
 
     public void updateData(List<String> newData) {
-        stringList = newData;
+        RoomsList = newData;
         notifyDataSetChanged();
     }
 
