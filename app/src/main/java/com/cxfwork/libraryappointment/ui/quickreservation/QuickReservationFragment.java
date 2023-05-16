@@ -72,100 +72,104 @@ public class QuickReservationFragment extends Fragment {
         filterbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-                View fragment_filter_selection = getLayoutInflater().inflate(R.layout.fragment_filter_selection, null);
-                bottomSheetDialog.setContentView(fragment_filter_selection);
-
-                Button filterCancelBtn = fragment_filter_selection.findViewById(R.id.filterCancelBtn);
-                filterCancelBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bottomSheetDialog.dismiss();
-                    }
-                });
-
-                // 找到按钮
-                Button filterConfirmBtn = fragment_filter_selection.findViewById(R.id.filterreflashBtn);
-                // 设置按钮的点击事件监听器
-                filterConfirmBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(Date>=0 && Timebegin>=0 && Timeend>=0 && Location>=0){
-                            String sfilter = "Date:"+Date+"Timebegin:"+Timebegin+"Timeend:"+Timeend+"Location:"+Location;
-                            //TODO
-                            Toast.makeText(requireContext(), sfilter, Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            Toast.makeText(requireContext(), "请填写完整信息", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
-                /***********************************************/
-                RangeSlider rangeSlider = fragment_filter_selection.findViewById(R.id.timepicker);
-                rangeSlider.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
-                    @Override
-                    @SuppressLint("RestrictedApi")
-                    public void onStartTrackingTouch(@NonNull RangeSlider slider) {}
-                    @Override
-                    @SuppressLint("RestrictedApi")
-                    public void onStopTrackingTouch(@NonNull RangeSlider slider) {
-
-                        List<Float> values = rangeSlider.getValues();
-                        float minValue = values.get(0);
-                        float maxValue = values.get(1);
-                        Timebegin = (int)minValue;
-                        Timeend = (int)maxValue;
-                        Toast.makeText(requireContext(), "Min value: " + minValue+"Max value: " + maxValue, Toast.LENGTH_SHORT).show();
-                    }
-
-                });
-
-                MaterialButtonToggleGroup dateSelector = (MaterialButtonToggleGroup)fragment_filter_selection.findViewById(R.id.dateSelector);
-                dateSelector.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
-                    @Override
-                    public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                        if(isChecked){
-                            if(checkedId == R.id.todaybtn) Date = 1;
-                            if(checkedId == R.id.nextdaybtn) Date = 2;
-                        }
-                    }
-                });
-                MaterialButtonToggleGroup locationSelector = (MaterialButtonToggleGroup)fragment_filter_selection.findViewById(R.id.locationSelector);
-                locationSelector.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
-                    @Override
-                    public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                        if(isChecked){
-                            if(checkedId == R.id.locationbutton1) Location = 1;
-                            if(checkedId == R.id.locationbutton2) Location = 2;
-                            if(checkedId == R.id.locationbutton3) Location = 3;
-                            if(checkedId == R.id.locationbutton4) Location = 4;
-                            if(checkedId == R.id.locationbutton5) Location = 4;
-                        }
-                    }
-                });
-                /***********************************************/
-                String[] buttonNames = {"教室编号1", "教室编号2", "教室编号3"};
-                List<String> buttonNamesList = Arrays.asList(buttonNames);
-
-                RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
-                recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 2));
-                ClassroomAdapter classroomAdapter = new ClassroomAdapter(buttonNamesList, new ClassroomAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        String selectedString = buttonNamesList.get(position);
-                        commonViewModel.setNewReservationRooms(selectedString);
-                    }
-                });
-                recyclerView2.setAdapter(classroomAdapter);
-
-
-                bottomSheetDialog.show();
+                filterSheetProcess(v);
             }
 
         });
 
         return root;
+    }
+
+    private void filterSheetProcess(View v){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View fragment_filter_selection = getLayoutInflater().inflate(R.layout.fragment_filter_selection, null);
+        bottomSheetDialog.setContentView(fragment_filter_selection);
+
+        Button filterCancelBtn = fragment_filter_selection.findViewById(R.id.filterCancelBtn);
+        filterCancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        // 找到按钮
+        Button filterConfirmBtn = fragment_filter_selection.findViewById(R.id.filterreflashBtn);
+        // 设置按钮的点击事件监听器
+        filterConfirmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Date>=0 && Timebegin>=0 && Timeend>=0 && Location>=0){
+                    String sfilter = "Date:"+Date+"Timebegin:"+Timebegin+"Timeend:"+Timeend+"Location:"+Location;
+                    //TODO
+                    Toast.makeText(requireContext(), sfilter, Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(requireContext(), "请填写完整信息", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        /***********************************************/
+        RangeSlider rangeSlider = fragment_filter_selection.findViewById(R.id.timepicker);
+        rangeSlider.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
+            @Override
+            @SuppressLint("RestrictedApi")
+            public void onStartTrackingTouch(@NonNull RangeSlider slider) {}
+            @Override
+            @SuppressLint("RestrictedApi")
+            public void onStopTrackingTouch(@NonNull RangeSlider slider) {
+
+                List<Float> values = rangeSlider.getValues();
+                float minValue = values.get(0);
+                float maxValue = values.get(1);
+                Timebegin = (int)minValue;
+                Timeend = (int)maxValue;
+                Toast.makeText(requireContext(), "Min value: " + minValue+"Max value: " + maxValue, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+        MaterialButtonToggleGroup dateSelector = (MaterialButtonToggleGroup)fragment_filter_selection.findViewById(R.id.dateSelector);
+        dateSelector.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if(isChecked){
+                    if(checkedId == R.id.todaybtn) Date = 1;
+                    if(checkedId == R.id.nextdaybtn) Date = 2;
+                }
+            }
+        });
+        MaterialButtonToggleGroup locationSelector = (MaterialButtonToggleGroup)fragment_filter_selection.findViewById(R.id.locationSelector);
+        locationSelector.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                if(isChecked){
+                    if(checkedId == R.id.locationbutton1) Location = 1;
+                    if(checkedId == R.id.locationbutton2) Location = 2;
+                    if(checkedId == R.id.locationbutton3) Location = 3;
+                    if(checkedId == R.id.locationbutton4) Location = 4;
+                    if(checkedId == R.id.locationbutton5) Location = 4;
+                }
+            }
+        });
+        /***********************************************/
+        String[] buttonNames = {"教室编号1", "教室编号2", "教室编号3"};
+        List<String> buttonNamesList = Arrays.asList(buttonNames);
+
+        RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
+        recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        ClassroomAdapter classroomAdapter = new ClassroomAdapter(buttonNamesList, new ClassroomAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                String selectedString = buttonNamesList.get(position);
+                commonViewModel.setNewReservationRooms(selectedString);
+            }
+        });
+        recyclerView2.setAdapter(classroomAdapter);
+
+
+        bottomSheetDialog.show();
     }
 
     private List<Integer> generateButtonNumbers() {
