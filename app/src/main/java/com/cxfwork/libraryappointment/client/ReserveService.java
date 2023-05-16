@@ -33,7 +33,7 @@ public class ReserveService {
         String[] buttonNames = {"A101#0", "A102#1", "A103#0"};
         List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
         if(filter.get("DateID").equals("1")){
-            lists.add("A201#1");
+            lists.add("A201#0");
         }
         return lists;
     }
@@ -43,7 +43,7 @@ public class ReserveService {
         String[] buttonNames = {"1#0", "2#1", "3#0"};
         List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
 
-        if(Objects.equals(filter.get("Room"), "A102")){
+        if(Objects.equals(filter.get("Room"), "A103")){
             lists.add("4#0");
         }
         if(Objects.equals(filter.get("Room"), "A201")){

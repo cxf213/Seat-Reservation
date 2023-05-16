@@ -149,6 +149,7 @@ public class QuickReservationFragment extends Fragment {
                 List<Float> values = rangeSlider.getValues();
                 commonViewModel.updateNewReservationValue("TimeIDbegin", String.valueOf(((int) (float) values.get(0))));
                 commonViewModel.updateNewReservationValue("TimeIDend", String.valueOf(((int) (float) values.get(1))));
+                classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
             }
 
         });
@@ -160,6 +161,7 @@ public class QuickReservationFragment extends Fragment {
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if (isChecked) {
                     commonViewModel.updateNewReservationValue("DateID", checkedId == R.id.todaybtn ? "1" : "2");
+                    classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
                 }
             }
         });
@@ -176,6 +178,7 @@ public class QuickReservationFragment extends Fragment {
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if (isChecked) {
                     commonViewModel.updateNewReservationValue("Building", String.valueOf(locationButtonList.indexOf(checkedId) + 1));
+                    classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
                 }
             }
         });

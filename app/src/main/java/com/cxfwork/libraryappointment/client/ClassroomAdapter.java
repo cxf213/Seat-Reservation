@@ -34,9 +34,10 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
         String[] items = RoomsList.get(position).split("#");
         if(items[1].equals("0")){
             holder.classroomBtn.setText(items[0]);
+            holder.classroomBtn.setTextColor(ContextCompat.getColor(holder.classroomBtn.getContext(), R.color.md_theme_light_primary));
         }else{
             holder.classroomBtn.setText(items[0]+"(课程)");
-            holder.classroomBtn.setEnabled(false);
+            holder.classroomBtn.setTextColor(ContextCompat.getColor(holder.classroomBtn.getContext(), R.color.md_theme_light_inversePrimary));
         }
     }
 
