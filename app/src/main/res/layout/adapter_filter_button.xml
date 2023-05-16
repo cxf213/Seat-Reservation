@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button
     xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?attr/materialButtonOutlinedStyle"
     android:id="@+id/adapter_filter_btn"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:layout_margin="5dp"
     android:textSize="16sp"
-    android:gravity="center"
-    android:textColor="@android:color/white" />
+    android:gravity="center" />

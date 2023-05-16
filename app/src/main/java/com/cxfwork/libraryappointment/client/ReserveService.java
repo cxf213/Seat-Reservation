@@ -30,23 +30,24 @@ public class ReserveService {
     }
 
     public static List<String> getRoomsList(Map<String, String> filter){
-        String[] buttonNames = {"A101", "A102", "A103"};
+        String[] buttonNames = {"A101#0", "A102#1", "A103#0"};
         List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
         if(filter.get("DateID").equals("1")){
-            lists.add("A201");
+            lists.add("A201#1");
         }
         return lists;
     }
 
     public static List<String> getSeatsList(Map<String, String> filter){
-        String[] buttonNames = {"1", "2", "3"};
+        //0：空闲，1：已预约，2：课程
+        String[] buttonNames = {"1#0", "2#1", "3#0"};
         List<String> lists = new ArrayList<>(Arrays.asList(buttonNames));
 
         if(Objects.equals(filter.get("Room"), "A102")){
-            lists.add("4");
+            lists.add("4#0");
         }
         if(Objects.equals(filter.get("Room"), "A201")){
-            lists.add("5");
+            lists.add("4#1");
         }
         return lists;
     }

@@ -31,8 +31,13 @@ public class ReserveBtnAdapter extends RecyclerView.Adapter<ReserveBtnAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ReserveBtnAdapter.ViewHolder holder, int position) {
-        String item = RoomsList.get(position);
-        holder.classroomBtn.setText(item);
+        String[] items = RoomsList.get(position).split("#");
+        holder.classroomBtn.setText(items[0]);
+        if(items[1].equals("0")){
+            holder.classroomBtn.setTextColor(ContextCompat.getColor(holder.classroomBtn.getContext(), R.color.md_theme_light_primary));
+        }else{
+            holder.classroomBtn.setTextColor(ContextCompat.getColor(holder.classroomBtn.getContext(), R.color.md_theme_light_inversePrimary));
+        }
     }
 
     @Override

@@ -33,7 +33,7 @@
     <string name="stuPhoneNum"></string>
     <string name="settinglang">Change Language</string>
     <string name="selectTime">Select Time and Location</string>
-    <string name="reflash">Refresh</string>
+    <string name="reflash">Load Rooms</string>
     <string name="modify">Modify</string>
     <string name="modifytext">Modify your infomation, Only write the item you want to modify.</string>
 </resources>

@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cxfwork.libraryappointment.R;
@@ -30,8 +31,13 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String item = RoomsList.get(position);
-        holder.classroomBtn.setText(item);
+        String[] items = RoomsList.get(position).split("#");
+        if(items[1].equals("0")){
+            holder.classroomBtn.setText(items[0]);
+        }else{
+            holder.classroomBtn.setText(items[0]+"(课程)");
+            holder.classroomBtn.setEnabled(false);
+        }
     }
 
     @Override

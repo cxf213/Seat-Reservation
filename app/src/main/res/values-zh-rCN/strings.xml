@@ -21,7 +21,7 @@
     <string name="info">更多信息</string>
     <string name="settinglang">改变语言</string>
     <string name="selectTime">选择时间</string>
-    <string name="reflash">刷新</string>
+    <string name="reflash">加载教室</string>
     <string name="modify">修改</string>
     <string name="modifytext">修改个人信息，只需要填写你需要修改的</string>
 </resources>
