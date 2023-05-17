@@ -13,7 +13,10 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
+import okhttp3.*;
+import android.util.Log;
 
 import com.cxfwork.libraryappointment.client.LoginService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -25,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
 
     Button loginbtn;
     TextInputEditText stuID, password;
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +36,26 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         loginbtn = findViewById(R.id.loginbtn);
 
-        if(!LoginService.checkNetwork()){
-            Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show();
-            loginbtn.setEnabled(false);
-            return;
-        }
+        OkHttpClient client = new OkHttpClient();
+        Request checkloginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/check_login")
+                .build();
+        client.newCall(checkloginRequest).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                        loginbtn.setEnabled(false);
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
 
         TextInputLayout stuIDLayout = findViewById(R.id.StuID);
         TextInputLayout PasswordLayout = findViewById(R.id.Password);
@@ -49,17 +68,48 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void LoginProcess() {
-        String username = stuID.getText().toString();
-        String password = this.password.getText().toString();
-        String result = LoginService.login(username, password);
-        if (result.equals("Success")) {
-            Nav2MainActivity();
-        } else if (result.equals("Register")) {
-            RegisterProcess();
-        } else {
-            Snackbar.make(findViewById(android.R.id.content), R.string.login_failed,
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        OkHttpClient client = new OkHttpClient();
+        String jsonBody = "{\"username\":\""+stuID.getText().toString()+"\",\"password\":\""+this.password.getText().toString()+"\"}";
+        Log.d("LoginActivity", "Response: " + jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/login")
+                .post(requestBody)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
+                            Nav2MainActivity();
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(response.code()==401){
+                                Snackbar.make(findViewById(android.R.id.content), R.string.login_failed,
+                                        Snackbar.LENGTH_SHORT).show();
+                            }else if(response.code()==402){
+                                RegisterProcess();
+                            } else if (response.code()==400) {
+                                Snackbar.make(findViewById(android.R.id.content), "Enter your username and password",
+                                        Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void RegisterProcess() {
@@ -102,8 +152,6 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // 在文本变化之后的回调方法
-                // 清除错误提示
                 stuPhoneNumLayout.setError(null);
             }
         });
