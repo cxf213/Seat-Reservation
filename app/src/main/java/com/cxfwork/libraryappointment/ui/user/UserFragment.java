@@ -1,5 +1,7 @@
 package com.cxfwork.libraryappointment.ui.user;
 
+import com.cxfwork.libraryappointment.client.LoginService;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,8 +18,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.cxfwork.libraryappointment.LoginActivity;
 import com.cxfwork.libraryappointment.MainActivity;
 import com.cxfwork.libraryappointment.R;
+import com.cxfwork.libraryappointment.client.LoginService;
 import com.cxfwork.libraryappointment.databinding.FragmentUserBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -93,6 +97,14 @@ public class UserFragment extends Fragment {
             getActivity().getBaseContext().getResources().updateConfiguration(config, getActivity().getBaseContext().getResources().getDisplayMetrics());
             Intent refresh = new Intent(getActivity(), getActivity().getClass());
             startActivity(refresh);
+            getActivity().finish();
+        });
+
+        Button logout = binding.logoutbtn;
+        logout.setOnClickListener(v -> {
+            LoginService.logout();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
             getActivity().finish();
         });
 

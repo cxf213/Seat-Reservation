@@ -41,4 +41,6 @@
     <string name="reserveSuccessTitle">"Success! "</string>
     <string name="reserveError">"There is a problem! "</string>
     <string name="reserveFailure">The %s position you selected has been occupied by %s, do you want to call a private number to ask?</string>
+    <string name="logout">Log out</string>
+    <string name="network_error">Network Error!!</string>
 </resources>

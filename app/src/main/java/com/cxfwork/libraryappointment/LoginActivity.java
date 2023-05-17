@@ -32,11 +32,20 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         loginbtn = findViewById(R.id.loginbtn);
 
+        if(!LoginService.checkNetwork()){
+            Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            loginbtn.setEnabled(false);
+            return;
+        }
+
         TextInputLayout stuIDLayout = findViewById(R.id.StuID);
         TextInputLayout PasswordLayout = findViewById(R.id.Password);
         stuID = (TextInputEditText) stuIDLayout.getEditText();
         password = (TextInputEditText) PasswordLayout.getEditText();
         loginbtn.setOnClickListener(v -> LoginProcess());
+        if(LoginService.checkLoginStatus()){
+            Nav2MainActivity();
+        }
     }
 
     private void LoginProcess() {

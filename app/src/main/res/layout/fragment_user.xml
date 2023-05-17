@@ -123,6 +123,19 @@
             android:text="@string/settinglang"
             app:icon="@drawable/baseline_settings_24" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <Button
+            android:id="@+id/logoutbtn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/logout"
+            app:icon="@drawable/baseline_logout_24" />
+
     </LinearLayout>
 
 

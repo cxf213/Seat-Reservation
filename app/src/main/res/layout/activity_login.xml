@@ -81,6 +81,7 @@
 
     <Button
         android:id="@+id/loginbtn"
+        app:icon="@drawable/baseline_login_24"
         android:layout_width="365dp"
         android:layout_height="59dp"
         android:layout_marginTop="45dp"
