@@ -1,5 +1,7 @@
 package com.cxfwork.libraryappointment.ui.quickreservation;
 
+import static com.cxfwork.libraryappointment.LoginActivity.JSON;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -34,20 +36,37 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import android.util.Log;
+
 public class QuickReservationFragment extends Fragment {
 
     private FragmentQuickReservationBinding binding;
     private ReserveBtnAdapter reserveBtnAdapter;
+    private ClassroomAdapter classroomAdapter;
     private CommonViewModel commonViewModel;
     private String displaystr;
+    List<String> seatsNamesList;
+    List<String> roomsNamesList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,18 +76,18 @@ public class QuickReservationFragment extends Fragment {
         binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
-        commonViewModel.setNewReservation(generateBasicFilter());
+        if (commonViewModel.getNewReservation().getValue().isEmpty())
+            commonViewModel.setNewReservation(generateBasicFilter());
         Button filterbtn = binding.filterbtn;
-
-
-        List<String> seatsNamesList = ReserveService.getSeatsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue()));
+        seatsNamesList = new ArrayList<>();
+        updateSeatsAdapter();
         RecyclerView recyclerView = binding.roomrecyclerview;
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         reserveBtnAdapter = new ReserveBtnAdapter(seatsNamesList, new ReserveBtnAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 // 最终预约
-                String[] selectedString = ReserveService.getSeatsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue())).get(position).split("#");
+                String[] selectedString = seatsNamesList.get(position).split("#");
                 commonViewModel.updateNewReservationValue("Seat", selectedString[0]);
                 dialogDisplay(selectedString);
             }
@@ -95,6 +114,7 @@ public class QuickReservationFragment extends Fragment {
             }
         });
 
+        updateClassroomAdapter();
         return root;
     }
 
@@ -111,20 +131,22 @@ public class QuickReservationFragment extends Fragment {
             }
         });
 
+        Log.d("TAG", "filterSheetProcess: "+roomsNamesList);
 
-        List<String> roomsNamesList = ReserveService.getRoomsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue()));
+
+
         RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
         recyclerView2.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        ClassroomAdapter classroomAdapter = new ClassroomAdapter(roomsNamesList, new ClassroomAdapter.OnItemClickListener() {
+        classroomAdapter = new ClassroomAdapter(roomsNamesList, new ClassroomAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String[] selectedString = ReserveService.getRoomsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue())).get(position).split("#");
+                String[] selectedString = roomsNamesList.get(position).split("#");
                 if(!selectedString[1].equals("0")){
                     Toast.makeText(requireContext(), "该教室无法预约:"+selectedString[1], Toast.LENGTH_SHORT).show();
                     return;
                 }
                 commonViewModel.updateNewReservationValue("Room", selectedString[0]);
-                reserveBtnAdapter.updateData(ReserveService.getSeatsList(Objects.requireNonNull(commonViewModel.getNewReservation().getValue())));
+                updateSeatsAdapter();
                 bottomSheetDialog.dismiss();
             }
         });
@@ -134,7 +156,7 @@ public class QuickReservationFragment extends Fragment {
         filterReflashBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
+                updateClassroomAdapter();
             }
         });
 
@@ -155,7 +177,7 @@ public class QuickReservationFragment extends Fragment {
                 List<Float> values = rangeSlider.getValues();
                 commonViewModel.updateNewReservationValue("TimeIDbegin", String.valueOf(((int) (float) values.get(0))));
                 commonViewModel.updateNewReservationValue("TimeIDend", String.valueOf(((int) (float) values.get(1))));
-                classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
+                updateClassroomAdapter();
             }
 
         });
@@ -167,7 +189,7 @@ public class QuickReservationFragment extends Fragment {
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if (isChecked) {
                     commonViewModel.updateNewReservationValue("DateID", checkedId == R.id.todaybtn ? "1" : "2");
-                    classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
+                    updateClassroomAdapter();
                 }
             }
         });
@@ -184,7 +206,7 @@ public class QuickReservationFragment extends Fragment {
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
                 if (isChecked) {
                     commonViewModel.updateNewReservationValue("Building", String.valueOf(locationButtonList.indexOf(checkedId) + 1));
-                    classroomAdapter.updateData(ReserveService.getRoomsList(commonViewModel.getNewReservation().getValue()));
+                    updateClassroomAdapter();
                 }
             }
         });
@@ -200,13 +222,7 @@ public class QuickReservationFragment extends Fragment {
                     .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Map<String,String> result = ReserveService.reserve(commonViewModel.getNewReservation().getValue());
-                            if(result.get("status").equals("1")) {
-                                Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
-                            }else {
-                                Toast.makeText(requireContext(), R.string.reserveError +result.get("message"), Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                            reserve(dialog,which,1);
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -226,14 +242,7 @@ public class QuickReservationFragment extends Fragment {
                     .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Uri uri = Uri.parse("tel:" + result.get("phone"));
-                            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
-                            if(ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
-                                Intent intent = new Intent(Intent.ACTION_CALL, uri);
-                                startActivity(intent);
-                            }
-                            else
-                                Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                            reserve(dialog,which,0);
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -248,7 +257,192 @@ public class QuickReservationFragment extends Fragment {
         }
     }
 
+    private void reserve(DialogInterface dialog, int which,int statue){
+        OkHttpClient client = new OkHttpClient();
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/reserve")
+                .post(requestBody)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("responseData", responseData);
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<Map<String, String>>() {}.getType();
+                            Map<String,String> result = gson.fromJson(responseData, type);
 
+                            if(statue == 1){
+                                if(result.get("status").equals("1")) {
+                                    Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
+                                }else {
+                                    Toast.makeText(requireContext(), R.string.reserveError +result.get("message"), Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }else{
+                                Uri uri = Uri.parse("tel:" + result.get("phone"));
+                                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                if(ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
+                                    Intent intent = new Intent(Intent.ACTION_CALL, uri);
+                                    startActivity(intent);
+                                }
+                                else
+                                    Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(response.code()==401){
+
+                            }else if(response.code()==402){
+
+                            }else if(response.code()==400) {
+
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void updateClassroomAdapter(){
+        OkHttpClient client = new OkHttpClient();
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/rooms")
+                .post(requestBody)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("responseData", responseData);
+                            Gson gson = new Gson();
+
+                            Type dataType = new TypeToken<jsondatatype>() {}.getType();
+                            jsondatatype myData = gson.fromJson(responseData, dataType);
+                            roomsNamesList = new ArrayList<>(myData.data);
+                            if(classroomAdapter != null)
+                                classroomAdapter.updateData(myData.data); //更新adapter的数据
+                        }
+                    });
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(response.code()==401){
+
+                            }else if(response.code()==402){
+
+                            }else if(response.code()==400) {
+
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void updateSeatsAdapter(){
+        OkHttpClient client = new OkHttpClient();
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/seats")
+                .post(requestBody)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("responseData", responseData);
+                            Gson gson = new Gson();
+
+                            Type dataType = new TypeToken<jsondatatype>() {}.getType();
+                            jsondatatype myData = gson.fromJson(responseData, dataType);
+                            seatsNamesList = new ArrayList<>(myData.data);
+                            if(reserveBtnAdapter != null)
+                                reserveBtnAdapter.updateData(myData.data); //更新adapter的数据
+                        }
+                    });
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(response.code()==401){
+
+                            }else if(response.code()==402){
+
+                            }else if(response.code()==400) {
+
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public class jsondatatype {public List<String> data;}
     private Map<String, String> generateBasicFilter() {
         Map<String, String> basicFilter = new HashMap<>();
         basicFilter.put("DateID", "2");

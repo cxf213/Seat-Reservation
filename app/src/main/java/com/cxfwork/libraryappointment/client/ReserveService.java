@@ -40,11 +40,8 @@ public class ReserveService {
      */
 
     public static List<String> getRoomsList(Map<String, String> filter){
-        String[] strings = {"A101#0", "A102#1", "A103#0"};
+        String[] strings = {"请刷新","请刷新"};
         List<String> lists = new ArrayList<>(Arrays.asList(strings));
-        if(filter.get("DateID").equals("1")){
-            lists.add("A201#0");
-        }
         return lists;
     }
 

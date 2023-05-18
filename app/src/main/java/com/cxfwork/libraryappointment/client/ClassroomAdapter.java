@@ -11,14 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cxfwork.libraryappointment.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.ViewHolder> {
     private List<String> RoomsList;
     private OnItemClickListener onItemClickListener;
 
-    public ClassroomAdapter(List<String> RoomsList, OnItemClickListener onItemClickListener) {
-        this.RoomsList = RoomsList;
+    public ClassroomAdapter(List<String> roomsList, OnItemClickListener onItemClickListener) {
+        this.RoomsList = new ArrayList<>(roomsList);
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -47,7 +48,7 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
     }
 
     public void updateData(List<String> newData) {
-        RoomsList = newData;
+        RoomsList = new ArrayList<>(newData);;
         notifyDataSetChanged();
     }
 
