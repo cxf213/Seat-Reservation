@@ -235,10 +235,9 @@ public class QuickReservationFragment extends Fragment {
             AlertDialog dialog = builder.create();
             dialog.show();
         }else{
-            Map<String,String> result = ReserveService.reserve(commonViewModel.getNewReservation().getValue());
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
             builder.setTitle(R.string.reserveError)
-                    .setMessage(getString(R.string.reserveFailure,displaystr+selectedString[0] + "号",result.get("message")))
+                    .setMessage(getString(R.string.reserveFailure,displaystr+selectedString[0] + "号"))
                     .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -286,9 +285,9 @@ public class QuickReservationFragment extends Fragment {
                                     Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
                                 }else {
                                     Toast.makeText(requireContext(), R.string.reserveError +result.get("message"), Toast.LENGTH_SHORT).show();
-                                    return;
                                 }
                             }else{
+                                Toast.makeText(requireContext(), result.get("name"), Toast.LENGTH_SHORT).show();
                                 Uri uri = Uri.parse("tel:" + result.get("phone"));
                                 ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
                                 if(ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
@@ -430,7 +429,7 @@ public class QuickReservationFragment extends Fragment {
                 }
             }
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -14,7 +14,6 @@ public class ReserveService {
         UserReserveInfo = HttpService.jsonToMap(HttpService.getUserReservation());
     }
     public Map<String,String> getUserReserveInfo(){
-
         return UserReserveInfo;
     }
     public void signin1(){

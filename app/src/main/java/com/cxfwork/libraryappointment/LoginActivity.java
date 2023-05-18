@@ -2,7 +2,9 @@ package com.cxfwork.libraryappointment;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +16,9 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import okhttp3.*;
 import android.util.Log;
@@ -23,6 +28,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -35,14 +45,50 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginbtn = findViewById(R.id.loginbtn);
+        TextInputLayout stuIDLayout = findViewById(R.id.StuID);
+        TextInputLayout PasswordLayout = findViewById(R.id.Password);
+        stuID = (TextInputEditText) stuIDLayout.getEditText();
+        password = (TextInputEditText) PasswordLayout.getEditText();
+        loginbtn.setOnClickListener(v -> LoginProcess());
 
+        Button testbtn = findViewById(R.id.testbtn);
+        testbtn.setOnClickListener(v -> autoLogin());
+        autoLogin();
+    }
+
+    private void autoLogin(){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
         OkHttpClient client = new OkHttpClient();
-        Request checkloginRequest = new Request.Builder()
-                .url("http://8.130.94.254:8888/check")
+        String jsonBody = "{}";
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/userInfo")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
-        client.newCall(checkloginRequest).enqueue(new Callback() {
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
+                            Nav2MainActivity();
+                        }
+                    });
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "请重新登录", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
             @Override
             public void onFailure(Call call, IOException e) {
@@ -50,25 +96,17 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                        loginbtn.setEnabled(false);
                     }
                 });
                 e.printStackTrace();
             }
         });
 
-        TextInputLayout stuIDLayout = findViewById(R.id.StuID);
-        TextInputLayout PasswordLayout = findViewById(R.id.Password);
-        stuID = (TextInputEditText) stuIDLayout.getEditText();
-        password = (TextInputEditText) PasswordLayout.getEditText();
-        loginbtn.setOnClickListener(v -> LoginProcess());
-        if(LoginService.checkLoginStatus()){
-            Nav2MainActivity();
-        }
+
     }
 
     private void LoginProcess() {
-        Nav2MainActivity();
+        //Nav2MainActivity();
         OkHttpClient client = new OkHttpClient();
         String jsonBody = "{\"username\":\""+stuID.getText().toString()+"\",\"password\":\""+this.password.getText().toString()+"\"}";
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
@@ -80,11 +118,23 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    String responseData = response.body().string();
+                    String responseBody = response.body().string();
+                    String jwtToken;
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(responseBody);
+                        jwtToken = jsonObject.getString("access_token"); // 获取access_token
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
+                            SharedPreferences sharedPreferences = getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("jwt_token", jwtToken);
+                            editor.apply();
+                            Toast.makeText(getApplicationContext(), "登陆成功", Toast.LENGTH_SHORT).show();
                             Nav2MainActivity();
                         }
                     });

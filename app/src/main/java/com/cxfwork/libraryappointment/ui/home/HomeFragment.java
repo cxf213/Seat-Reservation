@@ -1,6 +1,15 @@
 package com.cxfwork.libraryappointment.ui.home;
 
+import static com.cxfwork.libraryappointment.LoginActivity.JSON;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +17,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,15 +29,26 @@ import com.cxfwork.libraryappointment.MainActivity;
 import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.databinding.FragmentHomeBinding;
 import com.cxfwork.libraryappointment.ui.CommonViewModel;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private CommonViewModel commonViewModel;
     private MainActivity mainActivity;
+    private CommonViewModel commonViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -35,48 +57,119 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         mainActivity = (MainActivity) getActivity();
-
         NavController navController = NavHostFragment.findNavController(this);
         Button navInfoButton = binding.lookForRecordBtn;
         navInfoButton.setOnClickListener(v -> {
-            navInfoButton.setText(homeViewModel.getText().getValue());
             navController.navigate(R.id.reserveHistoryFragment);
         });
 
         // 绑定卡片和预约数据
+        getUserName();
+        postUserReservationAction(1, 0);
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
-        commonViewModel.getUserReservation().observe(this, new Observer<Map<String, String>>() {
-            @Override
-            public void onChanged(Map<String, String> UserReservation1) {
-                UpdateCards(UserReservation1);
-            }
-        });
+        commonViewModel.getUserReservation().observe(this, this::UpdateCards);
 
         Button signin1btn = binding.Signin1btn;
         signin1btn.setOnClickListener(v -> {
-            mainActivity.reserveService.signin1();
-            mainActivity.updatedata();
+            postUserReservationAction(1, 1);
         });
         Button signin2btn = binding.Signin2btn;
         signin2btn.setOnClickListener(v -> {
-            mainActivity.reserveService.signin2();
-            mainActivity.updatedata();
+            postUserReservationAction(2, 1);
         });
         Button cancel1btn = binding.Cancel1btn;
-            cancel1btn.setOnClickListener(v -> {
-            mainActivity.reserveService.cancel1();
-            mainActivity.updatedata();
+        cancel1btn.setOnClickListener(v -> {
+            postUserReservationAction(1, 2);
         });
         Button cancel2btn = binding.Cancel2btn;
         cancel2btn.setOnClickListener(v -> {
-            mainActivity.reserveService.cancel2();
-            mainActivity.updatedata();
+            postUserReservationAction(2, 2);
         });
-
-
-
-
         return root;
+    }
+
+    private void getUserName(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
+        OkHttpClient client = new OkHttpClient();
+        String jsonBody = "{}";
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/userInfo")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<Map<String, String>>() {}.getType();
+                            Map<String,String> result = gson.fromJson(responseData, type);
+                            Log.d("responseData", result.toString());
+                            binding.StuName.setText(result.get("username"));
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void postUserReservationAction(int id, int action){
+        OkHttpClient client = new OkHttpClient();
+        Gson gson = new Gson();
+        String jsonBody = "{\"id\":\""+id+"\",\"action\":\""+action+"\"}";
+        Log.d("jsonBody", jsonBody);
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/userReservation")
+                .post(requestBody)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<Map<String, String>>() {}.getType();
+                            Map<String,String> result = gson.fromJson(responseData, type);
+                            Log.d("responseData", result.toString());
+                            commonViewModel.setUserReservation(result);
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
     }
     private void UpdateCard1Info(Map<String, String> UserReservation){
         binding.card1SeatPos.setText(UserReservation.get("Seat1"));
@@ -89,6 +182,9 @@ public class HomeFragment extends Fragment {
         binding.card2SeatTime.setText(UserReservation.get("time2"));
     }
     public void UpdateCards(Map<String, String> UserReservation) {
+        if(UserReservation.get("haveReservation1") == null){
+            return;
+        }
         if(UserReservation.get("haveReservation1").equals("1")){
             UpdateCard1Info(UserReservation);
             binding.card1.setVisibility(View.VISIBLE);

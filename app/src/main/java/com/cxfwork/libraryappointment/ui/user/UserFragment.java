@@ -1,10 +1,15 @@
 package com.cxfwork.libraryappointment.ui.user;
 
+import static com.cxfwork.libraryappointment.LoginActivity.JSON;
+
 import com.cxfwork.libraryappointment.client.LoginService;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +29,21 @@ import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.client.LoginService;
 import com.cxfwork.libraryappointment.databinding.FragmentUserBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class UserFragment extends Fragment {
 
@@ -100,16 +118,48 @@ public class UserFragment extends Fragment {
             getActivity().finish();
         });
 
+
         Button logout = binding.logoutbtn;
         logout.setOnClickListener(v -> {
-            LoginService.logout();
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            startActivity(intent);
-            getActivity().finish();
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+            String jwtToken = sharedPreferences.getString("jwt_token", "");
+            OkHttpClient client = new OkHttpClient();
+            String jsonBody = "{}";
+            Log.d("jsonBody", jsonBody);
+            RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+            Request loginRequest = new Request.Builder()
+                    .url("http://8.130.94.254:8888/logout")
+                    .post(requestBody)
+                    .addHeader("Authorization", "Bearer " + jwtToken)
+                    .build();
+            client.newCall(loginRequest).enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove("jwt_token");
+                    editor.apply();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    e.printStackTrace();
+                }
+            });
+
         });
 
         return root;
     }
+
 
     @Override
     public void onDestroyView() {
