@@ -41,11 +41,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_margin="5dp"
+                android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <!-- Title, secondary and supporting text -->
                 <TextView
+                    android:id="@+id/stuName"
                     style="@style/TextAppearance.AppCompat.Large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -53,6 +55,7 @@
                     android:textAppearance="@style/ShapeAppearance.Material3.MediumComponent" />
 
                 <TextView
+                    android:id="@+id/stuID"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -66,8 +69,8 @@
                 style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="5dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_margin="20dp"
                 android:text=""
                 app:icon="@drawable/baseline_read_more_24" />
 

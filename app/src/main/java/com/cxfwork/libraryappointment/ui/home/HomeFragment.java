@@ -49,6 +49,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private MainActivity mainActivity;
     private CommonViewModel commonViewModel;
+    private SharedPreferences sharedPreferences;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
         mainActivity = (MainActivity) getActivity();
         NavController navController = NavHostFragment.findNavController(this);
+        sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         Button navInfoButton = binding.lookForRecordBtn;
         navInfoButton.setOnClickListener(v -> {
             navController.navigate(R.id.reserveHistoryFragment);
@@ -89,11 +91,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void getUserName(){
+        String username_id = sharedPreferences.getString("username_id", "NULL");
+        if(!username_id.equals("NULL")){
+            binding.StuName.setText(username_id.split("#")[0]);
+        }
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         OkHttpClient client = new OkHttpClient();
         String jsonBody = "{}";
-        Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
                 .url("http://8.130.94.254:8888/userInfo")
@@ -112,8 +117,8 @@ public class HomeFragment extends Fragment {
                             Gson gson = new Gson();
                             Type type = new TypeToken<Map<String, String>>() {}.getType();
                             Map<String,String> result = gson.fromJson(responseData, type);
-                            Log.d("responseData", result.toString());
-                            binding.StuName.setText(result.get("username"));
+                            sharedPreferences.edit().putString("username_id", result.get("username")).apply();
+                            binding.StuName.setText(result.get("username").split("#")[0]);
                         }
                     });
                 }
@@ -134,12 +139,14 @@ public class HomeFragment extends Fragment {
     private void postUserReservationAction(int id, int action){
         OkHttpClient client = new OkHttpClient();
         Gson gson = new Gson();
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
         String jsonBody = "{\"id\":\""+id+"\",\"action\":\""+action+"\"}";
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
                 .url("http://8.130.94.254:8888/userReservation")
                 .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;

@@ -10,9 +10,7 @@ import java.util.Objects;
 
 public class ReserveService {
     private Map<String,String> UserReserveInfo;
-    public ReserveService(){
-        UserReserveInfo = HttpService.jsonToMap(HttpService.getUserReservation());
-    }
+
     public Map<String,String> getUserReserveInfo(){
         return UserReserveInfo;
     }

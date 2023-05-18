@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,23 +15,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
-
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.Locale;
+
 import okhttp3.*;
 import android.util.Log;
 
-import com.cxfwork.libraryappointment.client.LoginService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,10 +34,16 @@ public class LoginActivity extends AppCompatActivity {
 
     Button loginbtn;
     TextInputEditText stuID, password;
+    SharedPreferences sharedPreferences;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sharedPreferences = getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String language = sharedPreferences.getString("language", "en");
+        setLanguage(language);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginbtn = findViewById(R.id.loginbtn);
@@ -50,14 +52,10 @@ public class LoginActivity extends AppCompatActivity {
         stuID = (TextInputEditText) stuIDLayout.getEditText();
         password = (TextInputEditText) PasswordLayout.getEditText();
         loginbtn.setOnClickListener(v -> LoginProcess());
-
-        Button testbtn = findViewById(R.id.testbtn);
-        testbtn.setOnClickListener(v -> autoLogin());
         autoLogin();
     }
 
     private void autoLogin(){
-        SharedPreferences sharedPreferences = getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         OkHttpClient client = new OkHttpClient();
         String jsonBody = "{}";
@@ -77,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
                             Nav2MainActivity();
                         }
                     });
@@ -96,6 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                        loginbtn.setEnabled(false);
                     }
                 });
                 e.printStackTrace();
@@ -235,9 +234,6 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 });
-
-
-                LoginService.register(stuID.getText().toString(), password.getText().toString(), stuName.getText().toString(), stuClass.getText().toString(), stuPhoneNum.getText().toString());
                 bottomSheetDialog.dismiss(); // 关闭 Bottom Sheet
                 Nav2MainActivity();
             }
@@ -258,6 +254,17 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         bottomSheetDialog.show();
+    }
+
+    public void setLanguage(String language) {
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
+
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+
+        Resources resources = getResources();
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
     }
 
     private void Nav2MainActivity() {

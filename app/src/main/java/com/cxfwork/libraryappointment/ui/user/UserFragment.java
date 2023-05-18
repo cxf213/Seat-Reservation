@@ -2,19 +2,17 @@ package com.cxfwork.libraryappointment.ui.user;
 
 import static com.cxfwork.libraryappointment.LoginActivity.JSON;
 
-import com.cxfwork.libraryappointment.client.LoginService;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,19 +22,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.cxfwork.libraryappointment.LoginActivity;
-import com.cxfwork.libraryappointment.MainActivity;
 import com.cxfwork.libraryappointment.R;
-import com.cxfwork.libraryappointment.client.LoginService;
 import com.cxfwork.libraryappointment.databinding.FragmentUserBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -49,6 +40,7 @@ public class UserFragment extends Fragment {
 
     private FragmentUserBinding binding;
     private boolean isDarkTheme = false;
+    SharedPreferences sharedPreferences;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,8 +49,12 @@ public class UserFragment extends Fragment {
 
         binding = FragmentUserBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         NavController navController = NavHostFragment.findNavController(this);
+        sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        String username_id = sharedPreferences.getString("username_id", "NULL");
+        binding.stuName.setText(username_id.split("#")[0]);
+        binding.stuID.setText(username_id.split("#")[1]);
+
         Button navUserInfoButton = binding.userinfobtn;
         navUserInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +70,7 @@ public class UserFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // 处理按钮的点击事件
-                        Toast.makeText(requireContext(), "按钮被点击", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "等待审核", Toast.LENGTH_SHORT).show();
                         bottomSheetDialog.dismiss();
                     }
                 });
@@ -98,21 +94,15 @@ public class UserFragment extends Fragment {
             getActivity().finish();
         });
 
+
         Button langettingbtn = binding.langettingbtn;
         langettingbtn.setOnClickListener(v -> {
-            Locale currentLocale = getResources().getConfiguration().locale;
-            Locale newLocale;
-            if (currentLocale.getLanguage().equals("en")) {
-                newLocale = new Locale("zh");
-            } else {
-                Locale.setDefault(Locale.ENGLISH);
-                newLocale = new Locale("en");
-
+            String language = sharedPreferences.getString("language", "en");
+            if(language.equals("en")){
+                sharedPreferences.edit().putString("language", "zh").apply();}else{
+                sharedPreferences.edit().putString("language", "en").apply();
             }
-            Locale.setDefault(newLocale);
-            Configuration config = new Configuration();
-            config.locale = newLocale;
-            getActivity().getBaseContext().getResources().updateConfiguration(config, getActivity().getBaseContext().getResources().getDisplayMetrics());
+            setLanguage(sharedPreferences.getString("language", "en"));
             Intent refresh = new Intent(getActivity(), getActivity().getClass());
             startActivity(refresh);
             getActivity().finish();
@@ -121,7 +111,6 @@ public class UserFragment extends Fragment {
 
         Button logout = binding.logoutbtn;
         logout.setOnClickListener(v -> {
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
             String jwtToken = sharedPreferences.getString("jwt_token", "");
             OkHttpClient client = new OkHttpClient();
             String jsonBody = "{}";
@@ -159,7 +148,16 @@ public class UserFragment extends Fragment {
 
         return root;
     }
+    public void setLanguage(String language) {
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
 
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+
+        Resources resources = getResources();
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
+    }
 
     @Override
     public void onDestroyView() {

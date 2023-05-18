@@ -4,8 +4,10 @@ import static com.cxfwork.libraryappointment.LoginActivity.JSON;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,6 +66,7 @@ public class QuickReservationFragment extends Fragment {
     private ReserveBtnAdapter reserveBtnAdapter;
     private ClassroomAdapter classroomAdapter;
     private CommonViewModel commonViewModel;
+    private SharedPreferences sharedPreferences;
     private String displaystr;
     List<String> seatsNamesList;
     List<String> roomsNamesList;
@@ -76,6 +79,7 @@ public class QuickReservationFragment extends Fragment {
         binding = FragmentQuickReservationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
+        sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         if (commonViewModel.getNewReservation().getValue().isEmpty())
             commonViewModel.setNewReservation(generateBasicFilter());
         Button filterbtn = binding.filterbtn;
@@ -258,6 +262,7 @@ public class QuickReservationFragment extends Fragment {
 
     private void reserve(DialogInterface dialog, int which,int statue){
         OkHttpClient client = new OkHttpClient();
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
         String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
         Log.d("jsonBody", jsonBody);
@@ -265,6 +270,7 @@ public class QuickReservationFragment extends Fragment {
         Request loginRequest = new Request.Builder()
                 .url("http://8.130.94.254:8888/reserve")
                 .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;
@@ -329,6 +335,7 @@ public class QuickReservationFragment extends Fragment {
 
     private void updateClassroomAdapter(){
         OkHttpClient client = new OkHttpClient();
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
         String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
         Log.d("jsonBody", jsonBody);
@@ -336,6 +343,7 @@ public class QuickReservationFragment extends Fragment {
         Request loginRequest = new Request.Builder()
                 .url("http://8.130.94.254:8888/rooms")
                 .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;
@@ -386,6 +394,7 @@ public class QuickReservationFragment extends Fragment {
 
     private void updateSeatsAdapter(){
         OkHttpClient client = new OkHttpClient();
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
         String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
         Log.d("jsonBody", jsonBody);
@@ -393,6 +402,7 @@ public class QuickReservationFragment extends Fragment {
         Request loginRequest = new Request.Builder()
                 .url("http://8.130.94.254:8888/seats")
                 .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;

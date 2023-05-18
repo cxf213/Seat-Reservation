@@ -10,6 +10,14 @@
     <string name="forget_password">忘记密码</string>
     <string name="login">登陆/注册</string>
     <string name="login_failed">登陆失败</string>
+    <string name="stuNamehint">真实名称</string>
+    <string name="stuClasshint">班级</string>
+    <string name="stuPhoneNumhint">电话号码</string>
+    <string name="register">注册</string>
+    <string name="complete_info">你还没有注册，请注册</string>
+    <string name="acceptEULA">接受用户协议</string>
+    <string name="login_success">登陆成功</string>
+    <string name="error_phone">错误的手机号码</string>
     <string name="welcome_text">，欢迎！</string>
     <string name="Current_reserve_display_text">你当前的预约信息为：</string>
     <string name="signin_btn">签到</string>
@@ -24,4 +32,11 @@
     <string name="reflash">加载教室</string>
     <string name="modify">修改</string>
     <string name="modifytext">修改个人信息，只需要填写你需要修改的</string>
+    <string name="confirm">确认</string>
+    <string name="reservationDialogConfirmTitle">确定要预约吗?</string>
+    <string name="reserveSuccessTitle">成功！</string>
+    <string name="reserveError">出现了问题！</string>
+    <string name="reserveFailure">你选择的%s位置已经被选取了，是否电话询问</string>
+    <string name="logout">登出</string>
+    <string name="network_error">网络异常！！</string>
 </resources>
