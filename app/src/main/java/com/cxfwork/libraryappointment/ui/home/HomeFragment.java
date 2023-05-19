@@ -97,7 +97,10 @@ public class HomeFragment extends Fragment implements CurrentReservationAdapter.
 
     @Override
     public void onCancelButtonClick(int position) {
-
+        List<Map<String, String>> dataList = currentReservationAdapter.getDataList();
+        String currentid = dataList.get(position).get("id");
+        Log.d("currentid", currentid);
+        postUserReservationAction(currentid, "cancel",this);
     }
 
 
@@ -150,7 +153,7 @@ public class HomeFragment extends Fragment implements CurrentReservationAdapter.
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
-                .url("http://8.130.94.254:8888/history")
+                .url("http://8.130.94.254:8888/userReservation")
                 .post(requestBody)
                 .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();

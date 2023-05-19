@@ -33,7 +33,7 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String[] items = RoomsList.get(position).split("#");
-        if(items[1].equals("0")){
+        if(items[1].equals("[]")){
             holder.classroomBtn.setText(items[0]);
             holder.classroomBtn.setTextColor(ContextCompat.getColor(holder.classroomBtn.getContext(), R.color.md_theme_light_primary));
         }else{

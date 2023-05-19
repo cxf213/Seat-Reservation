@@ -145,8 +145,8 @@ public class QuickReservationFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 String[] selectedString = roomsNamesList.get(position).split("#");
-                if(!selectedString[1].equals("0")){
-                    Toast.makeText(requireContext(), "该教室无法预约:"+selectedString[1], Toast.LENGTH_SHORT).show();
+                if(!selectedString[1].equals("[]")){
+                    Toast.makeText(requireContext(), "该教室时间段内无法预约，存在课程:"+selectedString[1], Toast.LENGTH_SHORT).show();
                     return;
                 }
                 commonViewModel.updateNewReservationValue("Room", selectedString[0]);
