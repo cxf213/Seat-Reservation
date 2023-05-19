@@ -34,6 +34,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,10 +92,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void getUserName(){
-        String username_id = sharedPreferences.getString("username_id", "NULL");
-        if(!username_id.equals("NULL")){
-            binding.StuName.setText(username_id.split("#")[0]);
-        }
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         OkHttpClient client = new OkHttpClient();
@@ -117,7 +114,6 @@ public class HomeFragment extends Fragment {
                             Gson gson = new Gson();
                             Type type = new TypeToken<Map<String, String>>() {}.getType();
                             Map<String,String> result = gson.fromJson(responseData, type);
-                            sharedPreferences.edit().putString("username_id", result.get("username")).apply();
                             binding.StuName.setText(result.get("username").split("#")[0]);
                         }
                     });

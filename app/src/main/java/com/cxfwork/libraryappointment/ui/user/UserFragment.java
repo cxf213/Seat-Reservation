@@ -24,10 +24,18 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.cxfwork.libraryappointment.LoginActivity;
 import com.cxfwork.libraryappointment.R;
 import com.cxfwork.libraryappointment.databinding.FragmentUserBinding;
+import com.cxfwork.libraryappointment.ui.CommonViewModel;
+import com.cxfwork.libraryappointment.ui.home.HomeFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,6 +49,7 @@ public class UserFragment extends Fragment {
     private FragmentUserBinding binding;
     private boolean isDarkTheme = false;
     SharedPreferences sharedPreferences;
+    private CommonViewModel commonViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,9 +60,9 @@ public class UserFragment extends Fragment {
         View root = binding.getRoot();
         NavController navController = NavHostFragment.findNavController(this);
         sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
-        String username_id = sharedPreferences.getString("username_id", "NULL");
-        binding.stuName.setText(username_id.split("#")[0]);
-        binding.stuID.setText(username_id.split("#")[1]);
+        commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
+
+        setUserInfo();
 
         Button navUserInfoButton = binding.userinfobtn;
         navUserInfoButton.setOnClickListener(new View.OnClickListener() {
@@ -147,6 +156,48 @@ public class UserFragment extends Fragment {
         });
 
         return root;
+    }
+
+    public void setUserInfo(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        String jwtToken = sharedPreferences.getString("jwt_token", "");
+        OkHttpClient client = new OkHttpClient();
+        String jsonBody = "{}";
+        RequestBody requestBody = RequestBody.create(jsonBody, JSON);
+        Request loginRequest = new Request.Builder()
+                .url("http://8.130.94.254:8888/userInfo")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + jwtToken)
+                .build();
+        client.newCall(loginRequest).enqueue(new Callback() {
+            List<String> classroomList;
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<Map<String, String>>() {}.getType();
+                            Map<String,String> result = gson.fromJson(responseData, type);
+                            binding.stuName.setText(result.get("username").split("#")[0]);
+                            binding.stuID.setText(result.get("username").split("#")[1]);;
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+        });
     }
     public void setLanguage(String language) {
         Locale locale = new Locale(language);
