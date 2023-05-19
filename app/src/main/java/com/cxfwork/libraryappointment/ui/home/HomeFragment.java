@@ -24,9 +24,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.cxfwork.libraryappointment.MainActivity;
 import com.cxfwork.libraryappointment.R;
+import com.cxfwork.libraryappointment.client.CurrentReservationAdapter;
+import com.cxfwork.libraryappointment.client.ReserveHistoryAdapter;
 import com.cxfwork.libraryappointment.databinding.FragmentHomeBinding;
 import com.cxfwork.libraryappointment.ui.CommonViewModel;
 import com.google.gson.Gson;
@@ -34,9 +38,11 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -45,12 +51,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements CurrentReservationAdapter.OnButtonClickListener{
 
     private FragmentHomeBinding binding;
     private MainActivity mainActivity;
     private CommonViewModel commonViewModel;
     private SharedPreferences sharedPreferences;
+    private RecyclerView recyclerView;
+    private CurrentReservationAdapter currentReservationAdapter;
+    private boolean initData = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -61,35 +70,36 @@ public class HomeFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
         NavController navController = NavHostFragment.findNavController(this);
         sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+
+
+
+        recyclerView = binding.CurrentReserveDisplay;
+        postUserReservationAction("", "",this);
+
+
         Button navInfoButton = binding.lookForRecordBtn;
         navInfoButton.setOnClickListener(v -> {
             navController.navigate(R.id.reserveHistoryFragment);
         });
 
-        // 绑定卡片和预约数据
         getUserName();
-        postUserReservationAction(1, 0);
         commonViewModel = new ViewModelProvider(requireActivity()).get(CommonViewModel.class);
-        commonViewModel.getUserReservation().observe(this, this::UpdateCards);
-
-        Button signin1btn = binding.Signin1btn;
-        signin1btn.setOnClickListener(v -> {
-            postUserReservationAction(1, 1);
-        });
-        Button signin2btn = binding.Signin2btn;
-        signin2btn.setOnClickListener(v -> {
-            postUserReservationAction(2, 1);
-        });
-        Button cancel1btn = binding.Cancel1btn;
-        cancel1btn.setOnClickListener(v -> {
-            postUserReservationAction(1, 2);
-        });
-        Button cancel2btn = binding.Cancel2btn;
-        cancel2btn.setOnClickListener(v -> {
-            postUserReservationAction(2, 2);
-        });
         return root;
     }
+
+    @Override
+    public void onSigninButtonClick(int position) {
+        List<Map<String, String>> dataList = currentReservationAdapter.getDataList();
+        String currentid = dataList.get(position).get("id");
+        Log.d("currentid", currentid);
+        postUserReservationAction(currentid, "signin",this);
+    }
+
+    @Override
+    public void onCancelButtonClick(int position) {
+
+    }
+
 
     private void getUserName(){
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyApp", Context.MODE_PRIVATE);
@@ -132,7 +142,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void postUserReservationAction(int id, int action){
+    private void postUserReservationAction(String id, String action, CurrentReservationAdapter.OnButtonClickListener onButtonClickListener){
         OkHttpClient client = new OkHttpClient();
         Gson gson = new Gson();
         String jwtToken = sharedPreferences.getString("jwt_token", "");
@@ -140,7 +150,7 @@ public class HomeFragment extends Fragment {
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
-                .url("http://8.130.94.254:8888/userReservation")
+                .url("http://8.130.94.254:8888/history")
                 .post(requestBody)
                 .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
@@ -154,10 +164,16 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void run() {
                             Gson gson = new Gson();
-                            Type type = new TypeToken<Map<String, String>>() {}.getType();
-                            Map<String,String> result = gson.fromJson(responseData, type);
+                            Type type = new TypeToken<List<Map<String, String>>>() {}.getType();
+                            List<Map<String, String>> result = gson.fromJson(responseData, type);
                             Log.d("responseData", result.toString());
-                            commonViewModel.setUserReservation(result);
+                            if(Objects.equals(id, "")){
+                                currentReservationAdapter = new CurrentReservationAdapter(result,onButtonClickListener);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                recyclerView.setAdapter(currentReservationAdapter);
+                            }else{
+                                currentReservationAdapter.updateData(result);
+                            }
                         }
                     });
                 }
@@ -173,54 +189,6 @@ public class HomeFragment extends Fragment {
                 e.printStackTrace();
             }
         });
-    }
-    private void UpdateCard1Info(Map<String, String> UserReservation){
-        binding.card1SeatPos.setText(UserReservation.get("Seat1"));
-        binding.card1SeatPos2.setText(UserReservation.get("location1"));
-        binding.card1SeatTime.setText(UserReservation.get("time1"));
-    }
-    private void UpdateCard2Info(Map<String, String> UserReservation){
-        binding.card2SeatPos.setText(UserReservation.get("Seat2"));
-        binding.card2SeatPos2.setText(UserReservation.get("location2"));
-        binding.card2SeatTime.setText(UserReservation.get("time2"));
-    }
-    public void UpdateCards(Map<String, String> UserReservation) {
-        if(UserReservation.get("haveReservation1") == null){
-            return;
-        }
-        if(UserReservation.get("haveReservation1").equals("1")){
-            UpdateCard1Info(UserReservation);
-            binding.card1.setVisibility(View.VISIBLE);
-        }else{
-            binding.card1.setVisibility(View.GONE);
-        }
-
-        if(UserReservation.get("haveSignin1").equals("1")) {
-            binding.Signin1btn.setText("Signed in");
-            binding.Signin1btn.setEnabled(false);
-        }else{
-            binding.Signin1btn.setText("Sign in");
-            binding.Signin1btn.setEnabled(true);
-        }
-
-        if(UserReservation.get("haveReservation2").equals("1")){
-            UpdateCard2Info(UserReservation);
-            binding.card2.setVisibility(View.VISIBLE);
-        }else{
-            binding.card2.setVisibility(View.GONE);
-        }
-
-        if(UserReservation.get("haveSignin2").equals("1")) {
-            binding.Signin2btn.setText("Signed in");
-            binding.Signin2btn.setEnabled(false);
-        }else{
-            binding.Signin2btn.setText("Sign in");
-            binding.Signin2btn.setEnabled(true);
-        }
-        if(binding.card1.getVisibility() == View.GONE && binding.card2.getVisibility() == View.GONE)
-            binding.cardno.setVisibility(View.VISIBLE);
-        else
-            binding.cardno.setVisibility(View.GONE);
     }
     @Override
     public void onDestroyView() {

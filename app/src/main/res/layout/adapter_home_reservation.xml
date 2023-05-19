@@ -54,14 +54,14 @@
             android:orientation="vertical">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/Signin1btn"
+                android:id="@+id/signinbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
                 android:text="@string/signin_btn" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/Cancel1btn"
+                android:id="@+id/cancelbtn"
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -31,8 +31,8 @@ public class ReserveHistoryAdapter extends RecyclerView.Adapter<ReserveHistoryAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Map<String, String> data = dataList.get(position);
 
-        String seatPos = data.get("seatPos");
-        String seatPos2 = data.get("seatPos2");
+        String seatPos = data.get("seatID");
+        String seatPos2 = data.get("seatTime");
         String seatTime = data.get("seatTime");
 
         holder.card1SeatPos.setText(seatPos);
