@@ -194,7 +194,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 OkHttpClient client = new OkHttpClient();
-                String jsonBody = "{\"username\":\""+stuID.getText().toString()+"\",\"password\":\""+password.getText().toString()+"\",\"name\":\""+stuName.getText().toString()+"\",\"class\":\""+stuClass.getText().toString()+"\",\"phone\":\""+stuPhoneNum.getText().toString()+"\"}";
+                String jsonBody = "{\"stuID\":\""+stuID.getText().toString()+"\",\"password\":\""+password.getText().toString()+"\",\"name\":\""+stuName.getText().toString()+"\",\"class\":\""+stuClass.getText().toString()+"\",\"phone\":\""+stuPhoneNum.getText().toString()+"\"}";
+                Log.d("TAG","jsonBody");
                 RequestBody requestBody = RequestBody.create(jsonBody, JSON);
                 Request loginRequest = new Request.Builder()
                         .url("http://8.130.94.254:8888/register")
@@ -209,7 +210,7 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     Toast.makeText(getApplicationContext(), responseData, Toast.LENGTH_SHORT).show();
-                                    Nav2MainActivity();
+                                    //Nav2MainActivity();
                                 }
                             });
                         } else {

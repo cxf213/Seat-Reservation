@@ -278,23 +278,21 @@ public class QuickReservationFragment extends Fragment {
                                 if(result.get("result").equals("Self conflict")){
                                     Toast.makeText(requireContext(), R.string.self_conflict, Toast.LENGTH_SHORT).show();
                                 }else{
-                                    String dialogMessage;
-                                    dialogMessage = getString(R.string.reserveFailure,result.get("seat"),result.get("UserID"));
+                                    String dialogMessage = getString(R.string.reserveFailure,result.get("seat"),result.get("UserID"));
                                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
                                     builder.setTitle(R.string.reserveError)
                                             .setMessage(dialogMessage)
                                             .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-
-                                                    Toast.makeText(requireContext(), result.get("Fail"), Toast.LENGTH_SHORT).show();
-//                                                Uri uri = Uri.parse("tel:" + result.get("phone"));
-//                                                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
-//                                                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-//                                                    Intent intent = new Intent(Intent.ACTION_CALL, uri);
-//                                                    startActivity(intent);
-//                                                } else
-//                                                    Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(requireContext(), result.get("status"), Toast.LENGTH_SHORT).show();
+                                                    Uri uri = Uri.parse("tel:" + result.get("phone"));
+                                                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                                    if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                                                        Intent intent = new Intent(Intent.ACTION_CALL, uri);
+                                                        startActivity(intent);
+                                                    } else
+                                                        Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
                                             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
