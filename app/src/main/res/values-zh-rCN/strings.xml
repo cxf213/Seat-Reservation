@@ -36,7 +36,9 @@
     <string name="reservationDialogConfirmTitle">确定要预约吗?</string>
     <string name="reserveSuccessTitle">成功！</string>
     <string name="reserveError">出现了问题！</string>
-    <string name="reserveFailure">你选择的%s位置已经被选取了，是否电话询问</string>
+    <string name="reserveFailure">你选择的%s号位置已经被 %s 选取了，是否电话询问</string>
     <string name="logout">登出</string>
     <string name="network_error">网络异常！！</string>
+    <string name="reserve_dialog_content">你正在预约 %s 位置.</string>
+    <string name="reserve_dialog_content_posible_fail">.但是很可能失败.</string>
 </resources>

@@ -35,7 +35,10 @@
     <string name="reservationDialogConfirmTitle">Are you sure to reserve?</string>
     <string name="reserveSuccessTitle">"Success! "</string>
     <string name="reserveError">"There is a problem! "</string>
-    <string name="reserveFailure">The %s position you selected has been occupied, do you want to call a private number to ask?</string>
+    <string name="reserveFailure">The %s position you selected has been occupied by %s, do you want to call a private number to ask?</string>
     <string name="logout">Log out</string>
     <string name="network_error">Network Error!!</string>
+    <string name="reserve_dialog_content">You are going to reserve %s position.</string>
+    <string name="reserve_dialog_content_posible_fail">" But it will be fail."</string>
+    <string name="self_conflict">Conflict with reservation of yourself</string>
 </resources>

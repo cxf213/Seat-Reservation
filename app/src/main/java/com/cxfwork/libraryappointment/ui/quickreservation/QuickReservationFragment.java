@@ -56,8 +56,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import android.util.Log;
 
 public class QuickReservationFragment extends Fragment {
@@ -135,8 +137,7 @@ public class QuickReservationFragment extends Fragment {
             }
         });
 
-        Log.d("TAG", "filterSheetProcess: "+roomsNamesList);
-
+        Log.d("TAG", "filterSheetProcess: " + roomsNamesList);
 
 
         RecyclerView recyclerView2 = fragment_filter_selection.findViewById(R.id.recyclerview2);
@@ -145,8 +146,8 @@ public class QuickReservationFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 String[] selectedString = roomsNamesList.get(position).split("#");
-                if(!selectedString[1].equals("[]")){
-                    Toast.makeText(requireContext(), "该教室时间段内无法预约，存在课程:"+selectedString[1], Toast.LENGTH_SHORT).show();
+                if (!selectedString[1].equals("[]")) {
+                    Toast.makeText(requireContext(), "该教室时间段内无法预约，存在课程:" + selectedString[1], Toast.LENGTH_SHORT).show();
                     return;
                 }
                 commonViewModel.updateNewReservationValue("Room", selectedString[0]);
@@ -218,53 +219,39 @@ public class QuickReservationFragment extends Fragment {
         bottomSheetDialog.show();
     }
 
-    private void dialogDisplay(String[] selectedString){
+    private void dialogDisplay(String[] selectedString) {
+        String dialogMessage;
         if(selectedString[1].equals("0")){
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-            builder.setTitle(R.string.reservationDialogConfirmTitle)
-                    .setMessage(displaystr + " " + selectedString[0] + "号座位")
-                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            reserve(dialog,which,1);
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            return;
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            dialogMessage = getString(R.string.reserve_dialog_content,displaystr)+ " " + selectedString[0] + "号座位";
         }else{
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-            builder.setTitle(R.string.reserveError)
-                    .setMessage(getString(R.string.reserveFailure,displaystr+selectedString[0] + "号"))
-                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            reserve(dialog,which,0);
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            return;
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            dialogMessage = getString(R.string.reserve_dialog_content,displaystr)+ " " + selectedString[0] + "号座位" + getString(R.string.reserve_dialog_content_posible_fail);
         }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setTitle(R.string.reservationDialogConfirmTitle)
+                .setMessage(dialogMessage)
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        reserve(dialog, which, 1);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
-    private void reserve(DialogInterface dialog, int which,int statue){
+    private void reserve(DialogInterface dialog, int which, int statue) {
         OkHttpClient client = new OkHttpClient();
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
-        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());
+        ;
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
@@ -273,7 +260,6 @@ public class QuickReservationFragment extends Fragment {
                 .addHeader("Authorization", "Bearer " + jwtToken)
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
-            List<String> classroomList;
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -283,25 +269,45 @@ public class QuickReservationFragment extends Fragment {
                         public void run() {
                             Log.d("responseData", responseData);
                             Gson gson = new Gson();
-                            Type type = new TypeToken<Map<String, String>>() {}.getType();
-                            Map<String,String> result = gson.fromJson(responseData, type);
+                            Type type = new TypeToken<Map<String, String>>() {
+                            }.getType();
+                            Map<String, String> result = gson.fromJson(responseData, type);
+                            if(Objects.equals(result.get("status"), "Success")){
+                                Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
+                            }else if(result.get("status").equals("Fail")) {
+                                if(result.get("result").equals("Self conflict")){
+                                    Toast.makeText(requireContext(), R.string.self_conflict, Toast.LENGTH_SHORT).show();
+                                }else{
+                                    String dialogMessage;
+                                    dialogMessage = getString(R.string.reserveFailure,result.get("seat"),result.get("UserID"));
+                                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+                                    builder.setTitle(R.string.reserveError)
+                                            .setMessage(dialogMessage)
+                                            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
 
-                            if(statue == 1){
-                                if(result.get("status").equals("1")) {
-                                    Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
-                                }else {
-                                    Toast.makeText(requireContext(), R.string.reserveError +result.get("message"), Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(requireContext(), result.get("Fail"), Toast.LENGTH_SHORT).show();
+//                                                Uri uri = Uri.parse("tel:" + result.get("phone"));
+//                                                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+//                                                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+//                                                    Intent intent = new Intent(Intent.ACTION_CALL, uri);
+//                                                    startActivity(intent);
+//                                                } else
+//                                                    Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    return;
+                                                }
+                                            });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
                                 }
                             }else{
-                                Toast.makeText(requireContext(), result.get("name"), Toast.LENGTH_SHORT).show();
-                                Uri uri = Uri.parse("tel:" + result.get("phone"));
-                                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
-                                if(ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
-                                    Intent intent = new Intent(Intent.ACTION_CALL, uri);
-                                    startActivity(intent);
-                                }
-                                else
-                                    Toast.makeText(requireContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), R.string.reserveError, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -309,17 +315,18 @@ public class QuickReservationFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(response.code()==401){
+                            if (response.code() == 401) {
 
-                            }else if(response.code()==402){
+                            } else if (response.code() == 402) {
 
-                            }else if(response.code()==400) {
+                            } else if (response.code() == 400) {
 
                             }
                         }
                     });
                 }
             }
+
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -333,11 +340,12 @@ public class QuickReservationFragment extends Fragment {
         });
     }
 
-    private void updateClassroomAdapter(){
+    private void updateClassroomAdapter() {
         OkHttpClient client = new OkHttpClient();
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
-        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());
+        ;
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
@@ -347,6 +355,7 @@ public class QuickReservationFragment extends Fragment {
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -357,10 +366,11 @@ public class QuickReservationFragment extends Fragment {
                             Log.d("responseData", responseData);
                             Gson gson = new Gson();
 
-                            Type dataType = new TypeToken<jsondatatype>() {}.getType();
+                            Type dataType = new TypeToken<jsondatatype>() {
+                            }.getType();
                             jsondatatype myData = gson.fromJson(responseData, dataType);
                             roomsNamesList = new ArrayList<>(myData.data);
-                            if(classroomAdapter != null)
+                            if (classroomAdapter != null)
                                 classroomAdapter.updateData(myData.data); //更新adapter的数据
                         }
                     });
@@ -368,17 +378,18 @@ public class QuickReservationFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(response.code()==401){
+                            if (response.code() == 401) {
 
-                            }else if(response.code()==402){
+                            } else if (response.code() == 402) {
 
-                            }else if(response.code()==400) {
+                            } else if (response.code() == 400) {
 
                             }
                         }
                     });
                 }
             }
+
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -392,11 +403,12 @@ public class QuickReservationFragment extends Fragment {
         });
     }
 
-    private void updateSeatsAdapter(){
+    private void updateSeatsAdapter() {
         OkHttpClient client = new OkHttpClient();
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
-        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());;
+        String jsonBody = gson.toJson(commonViewModel.getNewReservation().getValue());
+        ;
         Log.d("jsonBody", jsonBody);
         RequestBody requestBody = RequestBody.create(jsonBody, JSON);
         Request loginRequest = new Request.Builder()
@@ -406,6 +418,7 @@ public class QuickReservationFragment extends Fragment {
                 .build();
         client.newCall(loginRequest).enqueue(new Callback() {
             List<String> classroomList;
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -416,10 +429,11 @@ public class QuickReservationFragment extends Fragment {
                             Log.d("responseData", responseData);
                             Gson gson = new Gson();
 
-                            Type dataType = new TypeToken<jsondatatype>() {}.getType();
+                            Type dataType = new TypeToken<jsondatatype>() {
+                            }.getType();
                             jsondatatype myData = gson.fromJson(responseData, dataType);
                             seatsNamesList = new ArrayList<>(myData.data);
-                            if(reserveBtnAdapter != null)
+                            if (reserveBtnAdapter != null)
                                 reserveBtnAdapter.updateData(myData.data); //更新adapter的数据
                         }
                     });
@@ -427,17 +441,18 @@ public class QuickReservationFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(response.code()==401){
+                            if (response.code() == 401) {
 
-                            }else if(response.code()==402){
+                            } else if (response.code() == 402) {
 
-                            }else if(response.code()==400) {
+                            } else if (response.code() == 400) {
 
                             }
                         }
                     });
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -451,7 +466,10 @@ public class QuickReservationFragment extends Fragment {
         });
     }
 
-    public class jsondatatype {public List<String> data;}
+    public class jsondatatype {
+        public List<String> data;
+    }
+
     private Map<String, String> generateBasicFilter() {
         Map<String, String> basicFilter = new HashMap<>();
         basicFilter.put("DateID", "2");
