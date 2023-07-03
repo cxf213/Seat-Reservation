@@ -246,7 +246,7 @@ public class QuickReservationFragment extends Fragment {
         dialog.show();
     }
 
-    private void reserve(DialogInterface dialog, int which, int statue) {
+    private void reserve(DialogInterface dialog, int which, int statue1) {
         OkHttpClient client = new OkHttpClient();
         String jwtToken = sharedPreferences.getString("jwt_token", "");
         Gson gson = new Gson();
@@ -272,6 +272,8 @@ public class QuickReservationFragment extends Fragment {
                             Type type = new TypeToken<Map<String, String>>() {
                             }.getType();
                             Map<String, String> result = gson.fromJson(responseData, type);
+
+                            //Toast.makeText(requireContext(), result.get("status"), Toast.LENGTH_SHORT).show();
                             if(Objects.equals(result.get("status"), "Success")){
                                 Toast.makeText(requireContext(), R.string.reserveSuccessTitle, Toast.LENGTH_SHORT).show();
                             }else if(result.get("status").equals("Fail")) {
